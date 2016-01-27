@@ -1,3 +1,12 @@
-repositories {
-    mavenCentral()
-}
+subprojects {
+	repositories {
+   		mavenCentral()
+	}
+	
+	apply plugin: 'java'
+	
+	dependencies {
+		compile "org.projectlombok:lombok:1.16.6"
+	}
+2}
+
