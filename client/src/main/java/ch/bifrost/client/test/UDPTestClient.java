@@ -1,11 +1,26 @@
 package ch.bifrost.client.test;
 
+import ch.bifrost.core.api.datagram.Packet;
+import ch.bifrost.core.api.datagram.UDPDatagramEndpoint;
+
 public class UDPTestClient {
 
 	public static void main(String[] args) throws Exception {
-		DatagramClientWithReply client = new DatagramClientWithReply("localhost", 34543);
-		String reply = client.send("Hello World!");
-		System.out.println("Client: " + reply);
+		final String serverHost = "localhost";
+		final int serverPort = 34543;
+		UDPDatagramEndpoint clientEndpoint = new UDPDatagramEndpoint();
+		
+		System.out.println("Client sending a message.");
+		String msg = "Hello World!";
+		Packet outgoing = new Packet(serverHost, serverPort, msg);
+		clientEndpoint.send(outgoing);
+		System.out.println("Client sent a message: " + msg);
+		
+		Packet incoming = clientEndpoint.receive();
+		String receivedMessage = incoming.getContent();
+		System.out.println("Client received message: " + receivedMessage);
+		
+		clientEndpoint.close();
 	}
 	
 }
