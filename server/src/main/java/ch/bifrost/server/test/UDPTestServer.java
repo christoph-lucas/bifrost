@@ -1,7 +1,7 @@
 package ch.bifrost.server.test;
 
-import ch.bifrost.core.api.datagram.Packet;
-import ch.bifrost.core.api.datagram.UDPDatagramEndpoint;
+import ch.bifrost.core.impl.datagram.Packet;
+import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
 
 public class UDPTestServer {
 
