@@ -8,13 +8,23 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
+import ch.bifrost.core.api.datagram.Packet;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Implementation of {@link DatagramEndpoint} for UDP.
  */
 public class UDPDatagramEndpoint implements DatagramEndpoint {
 
-	private static final int SOCKET_TIMEOUT_IN_MS = 1000;
+	@Getter
+	@Setter
+	private int socketTimeoutInMs = 1000;
+	
+	@Getter
+	@Setter
+	private int receiverBufferSizeInBytes = 1024;
+	
 	private DatagramSocket socket;
 	private BlockingQueue<Packet> receivedPackets = new LinkedBlockingQueue<>();
 	private Receiver receiver;
@@ -39,7 +49,7 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 	}
 	
 	private void initialize() throws SocketException {
-		socket.setSoTimeout(SOCKET_TIMEOUT_IN_MS);
+		socket.setSoTimeout(socketTimeoutInMs);
 		receiver = new Receiver(socket, receivedPackets);
 		receiver.start();
 	}
@@ -48,7 +58,7 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 	public void close() throws IOException {
 		receiver.cancel();
 		try {
-			Thread.sleep(2*SOCKET_TIMEOUT_IN_MS);
+			Thread.sleep(2*socketTimeoutInMs);
 		} catch (InterruptedException e) {
 			socket.close();
 		}
@@ -65,7 +75,7 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 		return receivedPackets.take();
 	}
 	
-	private static class Receiver extends Thread {
+	private class Receiver extends Thread {
 		
 		private DatagramSocket localSocket;
 		private BlockingQueue<Packet> queue;
@@ -79,7 +89,7 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 		@Override
 		public void run() {
 			while(!cancelled) {
-				byte[] incomingBuffer = new byte[1024];
+				byte[] incomingBuffer = new byte[receiverBufferSizeInBytes];
 				DatagramPacket datagram = new DatagramPacket(incomingBuffer, incomingBuffer.length);
 				try {
 					localSocket.receive(datagram);

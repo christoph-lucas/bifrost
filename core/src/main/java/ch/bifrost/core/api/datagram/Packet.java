@@ -1,4 +1,4 @@
-package ch.bifrost.core.impl.datagram;
+package ch.bifrost.core.api.datagram;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -8,7 +8,6 @@ import org.bouncycastle.util.Arrays;
 
 import com.google.common.base.Charsets;
 
-import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

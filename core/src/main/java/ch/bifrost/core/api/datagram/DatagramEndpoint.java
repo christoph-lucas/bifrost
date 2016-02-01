@@ -3,8 +3,6 @@ package ch.bifrost.core.api.datagram;
 import java.io.Closeable;
 import java.io.IOException;
 
-import ch.bifrost.core.impl.datagram.Packet;
-
 /**
  * Represents an endpoint on the datagram layer.
  */
