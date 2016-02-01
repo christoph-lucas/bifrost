@@ -4,6 +4,10 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.bouncycastle.util.Arrays;
+
+import com.google.common.base.Charsets;
+
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,10 +22,10 @@ public class Packet {
 	@Getter
 	private int counterpartPort;
 	private byte[] bytes;
-	private int length;
 	
 	public static Packet fromDatagram(DatagramPacket datagram) {
-		return new Packet(datagram.getAddress(), datagram.getPort(), datagram.getData(), datagram.getLength());
+		byte[] content = Arrays.copyOfRange(datagram.getData(), 0, datagram.getLength());
+		return new Packet(datagram.getAddress(), datagram.getPort(), content);
 	}
 	
 	public Packet(InetAddress counterpartAddress, int counterpartPort, String content) {
@@ -35,18 +39,24 @@ public class Packet {
 	}
 	
 	public DatagramPacket toDatagram() {
-		return new DatagramPacket(bytes, length, counterpartAddress, counterpartPort);
+		return new DatagramPacket(bytes, bytes.length, counterpartAddress, counterpartPort);
 	}
 	
 	private void setFields(int counterpartPort, String content) {
 		this.counterpartPort = counterpartPort;
-		bytes = content.getBytes();
-		length = bytes.length;
+		bytes = encode(content);
 	}
 	
 	public String getContent() {
-		// TODO Encoding and decoding with Base64
-		return new String(bytes, 0, length);
+		return decode(bytes);
+	}
+	
+	private byte[] encode(String input) {
+		return input.getBytes(Charsets.UTF_8);
+	}
+	
+	private String decode(byte[] bytes) {
+		return new String(bytes, Charsets.UTF_8);
 	}
 	
 	
