@@ -6,16 +6,19 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
-import ch.bifrost.core.api.datagram.DatagramEndpoint;
+import com.google.common.base.Optional;
+
+import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
 import ch.bifrost.core.api.datagram.Packet;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Implementation of {@link DatagramEndpoint} for UDP.
+ * Implementation of {@link DatagramLayerAdapter} for UDP.
  */
-public class UDPDatagramEndpoint implements DatagramEndpoint {
+public class UDPDatagramEndpoint implements DatagramLayerAdapter {
 
 	@Getter
 	@Setter
@@ -75,6 +78,11 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 		return receivedPackets.take();
 	}
 	
+	@Override
+	public Optional<Packet> receive(long timeout, TimeUnit unit) throws InterruptedException {
+		return Optional.fromNullable(receivedPackets.poll(timeout, unit));
+	}
+	
 	private class Receiver extends Thread {
 		
 		private DatagramSocket localSocket;
@@ -110,6 +118,5 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 		}
 		
 	}
-	
 
 }
