@@ -1,3 +1,4 @@
 includeFlat 'core',
 	'server',
-	'client'
+	'client',
+	'integration-tests'

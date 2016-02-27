@@ -1,0 +1,4 @@
+dependencies {
+   compile project(':client')
+   compile project(':server')
+}
