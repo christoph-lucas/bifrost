@@ -3,6 +3,9 @@ package ch.bifrost.server.impl.session;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.session.Message;
@@ -15,6 +18,8 @@ import ch.bifrost.server.api.server.ServerProcessFactory;
  */
 public class EchoServer implements ServerProcess {
 
+    private static final Logger LOG = LoggerFactory.getLogger(EchoServer.class);
+	
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 	
@@ -33,10 +38,10 @@ public class EchoServer implements ServerProcess {
 				if (!message.isPresent()) {
 					continue;
 				}
-				System.out.println("Server received message, sending echo.");
+				LOG.debug("Server received message, sending echo.");
 				sessionEndpoint.send(new Message("Echo: " + message.get().getContent()));
 			} catch (InterruptedException | IOException e) {
-				System.out.println("Error receiving a message: " + e.getMessage());
+				LOG.debug("Error receiving a message: " + e.getMessage());
 			}
 		}
 	}

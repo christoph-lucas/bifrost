@@ -8,6 +8,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
@@ -20,6 +23,9 @@ import lombok.Setter;
  */
 public class UDPDatagramEndpoint implements DatagramLayerAdapter {
 
+    private static final Logger LOG = LoggerFactory.getLogger(UDPDatagramEndpoint.class);
+
+	
 	@Getter
 	@Setter
 	private int socketTimeoutInMs = 1000;
@@ -108,7 +114,7 @@ public class UDPDatagramEndpoint implements DatagramLayerAdapter {
 				try {
 					queue.put(packet);
 				} catch (InterruptedException e) {
-					System.out.println("Got interrupted and therefore lost a packet.");
+					LOG.warn("Got interrupted and therefore lost a packet.");
 				}
 			}
 		}

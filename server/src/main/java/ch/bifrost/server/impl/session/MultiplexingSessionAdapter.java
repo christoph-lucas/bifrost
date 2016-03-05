@@ -9,6 +9,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
@@ -48,7 +51,9 @@ public class MultiplexingSessionAdapter implements Closeable {
 
 	private class MultiplexingReceiver extends Thread {
 		
-		private static final int NUM_THREADS = 10;
+	    private final Logger LOG = LoggerFactory.getLogger(MultiplexingReceiver.class);
+
+	    private static final int NUM_THREADS = 10;
 		private DatagramLayerAdapter datagramEndpoint;
 		private SessionStore sessionStore = new SessionStore();
 		private boolean cancelled;
@@ -98,7 +103,7 @@ public class MultiplexingSessionAdapter implements Closeable {
 				try {
 					queue.put(sessionPacket);
 				} catch (InterruptedException e) {
-					System.out.println("Cannot file SessionPacket: " + sessionPacket);
+					LOG.debug("Cannot queue SessionPacket: " + sessionPacket);
 					e.printStackTrace();
 				}
 			}

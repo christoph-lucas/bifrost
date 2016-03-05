@@ -3,6 +3,8 @@ package ch.bifrost.integrationtest.session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.bifrost.client.impl.session.ClientSessionEndpoint;
 import ch.bifrost.core.api.session.Message;
@@ -12,6 +14,8 @@ import ch.bifrost.server.impl.session.MultiplexingSessionAdapter;
 
 public class NoCryptoSessionTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(NoCryptoSessionTest.class);
+	
 	private static final int SERVER_PORT = 12345;
 	private MultiplexingSessionAdapter server;
 	private ClientSessionEndpoint client;
@@ -33,15 +37,15 @@ public class NoCryptoSessionTest {
 	@Test
 	public void shouldPlayPingPongOnce() throws Exception {
 		client.send(new Message("ping"));
-		System.out.println(client.receive());
+		LOG.info(client.receive().toString());
 	}
 	
 	@Test
 	public void shouldPlayPingPongTwice() throws Exception {
 		client.send(new Message("ping"));
-		System.out.println(client.receive());
+		LOG.info(client.receive().toString());
 		client.send(new Message("pong"));
-		System.out.println(client.receive());
+		LOG.info(client.receive().toString());
 	}
 	
 }
