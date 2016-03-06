@@ -20,15 +20,15 @@ import ch.bifrost.core.impl.session.SingleSessionEndpoint;
 /**
  * Plugs everything together for a client.
  */
-public class ClientSessionEndpoint implements Closeable {
+public class ClientSessionEndpoint<T extends SessionLayerAdapter> implements Closeable {
 
 	public static final long TIMEOUT = 100L;
 
-	private SessionLayerAdapter sessionAdapter;
+	private T sessionAdapter;
 	private DatagramLayerAdapter datagramEndpoint;
 	private SingleSessionReceiver receiver;
 
-	public ClientSessionEndpoint(String serverHost, int serverPort, String sessionId, SessionLayerAdapterFactory factory) throws UnknownHostException, SocketException {
+	public ClientSessionEndpoint(String serverHost, int serverPort, String sessionId, SessionLayerAdapterFactory<T> factory) throws UnknownHostException, SocketException {
 		datagramEndpoint = new UDPDatagramEndpoint();
 		BlockingQueue<SessionPacket> queue = new LinkedBlockingQueue<>();
 		receiver = new SingleSessionReceiver(datagramEndpoint, queue);
@@ -56,4 +56,7 @@ public class ClientSessionEndpoint implements Closeable {
 		datagramEndpoint.close();
 	}
 
+	public T getSessionLayerAdapter() {
+		return sessionAdapter;
+	}
 }

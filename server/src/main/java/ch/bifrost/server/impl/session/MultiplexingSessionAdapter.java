@@ -73,10 +73,10 @@ public class MultiplexingSessionAdapter implements Closeable {
 		@Override
 		public void run() {
 			while(!cancelled) {
-				Optional<Packet> receivedPacket;
+				Optional<Packet> receivedPacket = Optional.absent();
 				try {
 					receivedPacket = datagramEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
-				} catch (InterruptedException e) {
+				} catch (IOException e) {
 					continue;
 				}
 				if (!receivedPacket.isPresent()) {

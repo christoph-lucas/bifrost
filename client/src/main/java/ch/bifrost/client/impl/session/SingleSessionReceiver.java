@@ -1,5 +1,6 @@
 package ch.bifrost.client.impl.session;
 
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +31,7 @@ public class SingleSessionReceiver extends Thread {
 			Optional<Packet> receivedPacket;
 			try {
 				receivedPacket = datagramEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
-			} catch (InterruptedException e) {
+			} catch (IOException e) {
 				continue;
 			}
 			if (!receivedPacket.isPresent()) {

@@ -4,7 +4,7 @@ import java.util.concurrent.BlockingQueue;
 
 import ch.bifrost.core.api.session.SessionPacket;
 import ch.bifrost.server.api.server.ServerProcess;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -15,11 +15,16 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-@AllArgsConstructor
+@Builder
 public class SessionState {
 
 	private String id;
 	private BlockingQueue<SessionPacket> receivedPackages;
 	private ServerProcess serverProcess;
-	
+	private boolean alive;
+
+	public void kill() {
+		alive = false;
+		serverProcess.cancel();
+	}
 }

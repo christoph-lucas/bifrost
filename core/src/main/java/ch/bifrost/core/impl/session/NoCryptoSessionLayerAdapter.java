@@ -43,10 +43,10 @@ public class NoCryptoSessionLayerAdapter implements SessionLayerAdapter {
 		return ThreadLocalRandom.current().ints(0, 9).limit(30).mapToObj(Integer::toString).collect(Collectors.joining());
 	}
 	
-	public static class NoCryptoSessionAdapterFactory implements SessionLayerAdapterFactory {
+	public static class NoCryptoSessionAdapterFactory implements SessionLayerAdapterFactory<NoCryptoSessionLayerAdapter> {
 		
 		@Override
-		public SessionLayerAdapter newSessionLayerAdapter(SingleSessionEndpoint endpoint) {
+		public NoCryptoSessionLayerAdapter newSessionLayerAdapter(SingleSessionEndpoint endpoint) {
 			return new NoCryptoSessionLayerAdapter(endpoint);
 		}
 	}

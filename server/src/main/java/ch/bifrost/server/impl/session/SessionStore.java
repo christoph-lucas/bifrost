@@ -18,7 +18,12 @@ public class SessionStore {
 	}
 	
 	public void put(String id, BlockingQueue<SessionPacket> packetReceiverQueue, ServerProcess process) {
-		store.put(id, new SessionState(id, packetReceiverQueue, process));
+		store.put(id, SessionState.builder()
+				.id(id)
+				.receivedPackages(packetReceiverQueue)
+				.serverProcess(process)
+				.alive(true)
+				.build());
 	}
 
 	public SessionState get(String id) {
@@ -26,7 +31,7 @@ public class SessionStore {
 	}
 	
 	public void kill(String id) {
-		store.get(id).getServerProcess().cancel();
+		store.get(id).kill();
 	}
 	
 	public void killAll() {

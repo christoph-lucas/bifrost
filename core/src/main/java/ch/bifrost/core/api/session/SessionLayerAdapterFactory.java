@@ -5,13 +5,13 @@ import ch.bifrost.core.impl.session.SingleSessionEndpoint;
 /**
  * A factory that produces {@link SessionLayerAdapter}s.
  */
-public interface SessionLayerAdapterFactory {
+public interface SessionLayerAdapterFactory<T extends SessionLayerAdapter> {
 
 	/**
 	 * Create a new {@link SessionLayerAdapter}.
 	 * @param singleSessionEndpoint to be used
 	 * @return a new {@link SessionLayerAdapter}
 	 */
-	SessionLayerAdapter newSessionLayerAdapter(SingleSessionEndpoint singleSessionEndpoint);
+	T newSessionLayerAdapter(SingleSessionEndpoint singleSessionEndpoint);
 	
 }
