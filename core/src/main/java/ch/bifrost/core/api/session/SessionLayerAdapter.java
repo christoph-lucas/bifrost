@@ -20,16 +20,16 @@ public interface SessionLayerAdapter {
 	/**
 	 * Blocking call to receive the next message.
 	 * @return the next message
-	 * @throws InterruptedException thrown when interrupted during wait for next message 
+	 * @throws Exception thrown if something went wrong 
 	 */
-	Message receive() throws InterruptedException;
+	Message receive() throws Exception;
 
 	/**
 	 * Blocking call to receive the next message, waiting at most for the timeout.
 	 * @return the next message or null if timeout exceeded
-	 * @throws InterruptedException thrown when interrupted during wait for next message 
+	 * @throws Exception thrown if something went wrong 
 	 */
-	Optional<Message> receive(long timeout, TimeUnit unit) throws InterruptedException;
+	Optional<Message> receive(long timeout, TimeUnit unit) throws Exception;
 
 	/**
 	 * Messages belonging to this adapter have to be recognized by an ID. This ID has to be computed from

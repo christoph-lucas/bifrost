@@ -1,6 +1,5 @@
 package ch.bifrost.server.impl.session;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ public class EchoServer implements ServerProcess {
 				}
 				LOG.debug("Server received message, sending echo.");
 				sessionEndpoint.send(new Message("Echo: " + message.get().getContent()));
-			} catch (InterruptedException | IOException e) {
+			} catch (Exception e) {
 				LOG.debug("Error receiving a message: " + e.getMessage());
 			}
 		}

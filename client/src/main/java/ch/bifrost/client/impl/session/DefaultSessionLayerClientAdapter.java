@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.bifrost.core.api.session.Message;
 import ch.bifrost.core.api.session.SessionLayerAdapterFactory;
-import ch.bifrost.core.impl.session.SingleSessionEndpoint;
+import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerAdapter;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessage;
@@ -25,8 +25,8 @@ public class DefaultSessionLayerClientAdapter extends DefaultSessionLayerAdapter
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerClientAdapter.class);
 
-	public DefaultSessionLayerClientAdapter(SingleSessionEndpoint endpoint) {
-		super(endpoint);
+	public DefaultSessionLayerClientAdapter(SessionAdapterNetworkAccessPoint networkAccessPoint) {
+		super(networkAccessPoint);
 	}
 
 	protected Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers(DefaultSessionLayerMessageSender sender, BlockingQueue<Message> queueTowardsUpperLayer) {
@@ -47,8 +47,8 @@ public class DefaultSessionLayerClientAdapter extends DefaultSessionLayerAdapter
 	public static class DefaultSessionLayerClientAdapterFactory implements SessionLayerAdapterFactory<DefaultSessionLayerClientAdapter> {
 		
 		@Override
-		public DefaultSessionLayerClientAdapter newSessionLayerAdapter(SingleSessionEndpoint endpoint) {
-			return new DefaultSessionLayerClientAdapter(endpoint);
+		public DefaultSessionLayerClientAdapter newSessionLayerAdapter(SessionAdapterNetworkAccessPoint networkAccessPoint) {
+			return new DefaultSessionLayerClientAdapter(networkAccessPoint);
 		}
 	}
 

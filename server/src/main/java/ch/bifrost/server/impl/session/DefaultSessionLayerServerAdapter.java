@@ -6,7 +6,7 @@ import java.util.concurrent.BlockingQueue;
 
 import ch.bifrost.core.api.session.Message;
 import ch.bifrost.core.api.session.SessionLayerAdapterFactory;
-import ch.bifrost.core.impl.session.SingleSessionEndpoint;
+import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerAdapter;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessageHandler;
@@ -18,7 +18,7 @@ import ch.bifrost.core.impl.session.defaultImpl.RekeyHandler;
  */
 public class DefaultSessionLayerServerAdapter extends DefaultSessionLayerAdapter {
 
-	public DefaultSessionLayerServerAdapter(SingleSessionEndpoint endpoint) {
+	public DefaultSessionLayerServerAdapter(SessionAdapterNetworkAccessPoint endpoint) {
 		super(endpoint);
 	}
 
@@ -32,7 +32,7 @@ public class DefaultSessionLayerServerAdapter extends DefaultSessionLayerAdapter
 	public static class DefaultSessionLayerServerAdapterFactory implements SessionLayerAdapterFactory<DefaultSessionLayerServerAdapter> {
 		
 		@Override
-		public DefaultSessionLayerServerAdapter newSessionLayerAdapter(SingleSessionEndpoint endpoint) {
+		public DefaultSessionLayerServerAdapter newSessionLayerAdapter(SessionAdapterNetworkAccessPoint endpoint) {
 			return new DefaultSessionLayerServerAdapter(endpoint);
 		}
 	}
