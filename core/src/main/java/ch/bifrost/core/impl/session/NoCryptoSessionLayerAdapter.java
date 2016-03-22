@@ -17,25 +17,25 @@ import ch.bifrost.core.api.session.SessionPacket;
  */
 public class NoCryptoSessionLayerAdapter implements SessionLayerAdapter {
 
-	private SingleSessionEndpoint endpoint;
+	private SessionAdapterNetworkAccessPoint networkAccessPoint;
 
-	public NoCryptoSessionLayerAdapter(SingleSessionEndpoint endpoint) {
-		this.endpoint = endpoint;
+	public NoCryptoSessionLayerAdapter(SessionAdapterNetworkAccessPoint networkAccessPoint) {
+		this.networkAccessPoint = networkAccessPoint;
 	}
 	
 	@Override
 	public void send(Message message) throws IOException {
-		endpoint.send(message);
+		networkAccessPoint.send(message);
 	}
 
 	@Override
-	public Message receive() throws InterruptedException {
-		return endpoint.receive();
+	public Message receive() throws Exception {
+		return networkAccessPoint.receive();
 	}
 
 	@Override
-	public Optional<Message> receive(long timeout, TimeUnit unit) throws InterruptedException {
-		return endpoint.receive(timeout, unit);
+	public Optional<Message> receive(long timeout, TimeUnit unit) throws Exception {
+		return networkAccessPoint.receive(timeout, unit);
 	}
 
 	@Override
@@ -46,8 +46,8 @@ public class NoCryptoSessionLayerAdapter implements SessionLayerAdapter {
 	public static class NoCryptoSessionAdapterFactory implements SessionLayerAdapterFactory<NoCryptoSessionLayerAdapter> {
 		
 		@Override
-		public NoCryptoSessionLayerAdapter newSessionLayerAdapter(SingleSessionEndpoint endpoint) {
-			return new NoCryptoSessionLayerAdapter(endpoint);
+		public NoCryptoSessionLayerAdapter newSessionLayerAdapter(SessionAdapterNetworkAccessPoint networkAccessPoint) {
+			return new NoCryptoSessionLayerAdapter(networkAccessPoint);
 		}
 	}
 

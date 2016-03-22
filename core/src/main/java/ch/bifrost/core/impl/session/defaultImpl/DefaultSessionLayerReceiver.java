@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.session.Message;
-import ch.bifrost.core.impl.session.SingleSessionEndpoint;
+import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
 
 /**
  * A receiver thread within the default session layer. Distinguishes between the different sorts of messages and handles
@@ -24,12 +24,12 @@ public class DefaultSessionLayerReceiver extends Thread {
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 
-	private SingleSessionEndpoint endpoint;
+	private SessionAdapterNetworkAccessPoint endpoint;
 	private boolean cancelled;
 	private Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers;
 	private final ObjectMapper json = new ObjectMapper();
 
-	public DefaultSessionLayerReceiver(SingleSessionEndpoint endpoint, Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers) {
+	public DefaultSessionLayerReceiver(SessionAdapterNetworkAccessPoint endpoint, Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers) {
 		this.endpoint = endpoint;
 		this.handlers = handlers;
 	}
@@ -37,10 +37,11 @@ public class DefaultSessionLayerReceiver extends Thread {
 	@Override
 	public void run() {
 		while(!cancelled) {
-			Optional<Message> receivedMessage = Optional.absent();
+			Optional<Message> receivedMessage;
 			try {
 				receivedMessage = endpoint.receive(TIMEOUT, TIMEOUT_UNIT);
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
+				LOG.warn("An exception occurred during receiving a message: " + e.getMessage(), e);
 				continue;
 			}
 			if (!receivedMessage.isPresent()) {

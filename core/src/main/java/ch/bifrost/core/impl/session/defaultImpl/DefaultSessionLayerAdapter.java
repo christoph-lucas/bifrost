@@ -1,5 +1,6 @@
 package ch.bifrost.core.impl.session.defaultImpl;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -19,12 +20,12 @@ import ch.bifrost.core.api.session.Message;
 import ch.bifrost.core.api.session.SessionException;
 import ch.bifrost.core.api.session.SessionLayerAdapter;
 import ch.bifrost.core.api.session.SessionPacket;
-import ch.bifrost.core.impl.session.SingleSessionEndpoint;
+import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
 
 /**
  * The default implementation of the session layer as proposed in the paper. Serves as a base class for both client and server.
  */
-public abstract class DefaultSessionLayerAdapter implements SessionLayerAdapter {
+public abstract class DefaultSessionLayerAdapter implements SessionLayerAdapter, Closeable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerAdapter.class);
 
@@ -35,9 +36,9 @@ public abstract class DefaultSessionLayerAdapter implements SessionLayerAdapter 
 	private final DefaultSessionLayerReceiver receiver;
 	private DefaultSessionLayerMessageSender sender; 
 
-	public DefaultSessionLayerAdapter(SingleSessionEndpoint endpoint) {
-		sender = new DefaultSessionLayerMessageSender(endpoint);
-		receiver = new DefaultSessionLayerReceiver(endpoint, getMessageHandlers(sender, queueTowardsUpperLayer));
+	public DefaultSessionLayerAdapter(SessionAdapterNetworkAccessPoint networkAccessPoint) {
+		sender = new DefaultSessionLayerMessageSender(networkAccessPoint);
+		receiver = new DefaultSessionLayerReceiver(networkAccessPoint, getMessageHandlers(sender, queueTowardsUpperLayer));
 		receiver.start();
 	}
 
@@ -78,15 +79,20 @@ public abstract class DefaultSessionLayerAdapter implements SessionLayerAdapter 
 		return ThreadLocalRandom.current().ints(0, 9).limit(30).mapToObj(Integer::toString).collect(Collectors.joining());
 	}
 	
+	@Override
+	public void close() throws IOException {
+		receiver.cancel();
+	}
+	
 	public static class DefaultSessionLayerMessageSender {
 		
 		private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerMessageSender.class);
 	
-		private final SingleSessionEndpoint endpoint;
+		private final SessionAdapterNetworkAccessPoint endpoint;
 		private final ObjectMapper mapper;
 
-		public DefaultSessionLayerMessageSender(SingleSessionEndpoint endpoint) {
-			this.endpoint = endpoint;
+		public DefaultSessionLayerMessageSender(SessionAdapterNetworkAccessPoint networkAccessPoint) {
+			this.endpoint = networkAccessPoint;
 			mapper = new ObjectMapper();
 		}
 		

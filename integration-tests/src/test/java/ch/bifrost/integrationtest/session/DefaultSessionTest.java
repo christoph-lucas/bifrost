@@ -16,6 +16,7 @@ import ch.bifrost.client.impl.session.DefaultSessionLayerClientAdapter.DefaultSe
 import ch.bifrost.core.api.session.Message;
 import ch.bifrost.server.impl.session.DefaultSessionLayerServerAdapter.DefaultSessionLayerServerAdapterFactory;
 import ch.bifrost.server.impl.session.EchoServer.EchoServerFactory;
+import ch.bifrost.server.impl.session.DefaultSessionLayerServerAdapter;
 import ch.bifrost.server.impl.session.MultiplexingSessionAdapter;
 
 public class DefaultSessionTest {
@@ -23,7 +24,7 @@ public class DefaultSessionTest {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionTest.class);
 	
 	private static final int SERVER_PORT = 12345;
-	private MultiplexingSessionAdapter server;
+	private MultiplexingSessionAdapter<DefaultSessionLayerServerAdapter> server;
 	private ClientSessionEndpoint<DefaultSessionLayerClientAdapter> client;
 
 	@BeforeClass
@@ -38,7 +39,7 @@ public class DefaultSessionTest {
 	
 	@Before
 	public void setupClientAndServer() throws Exception {
-		server = new MultiplexingSessionAdapter(SERVER_PORT, new DefaultSessionLayerServerAdapterFactory(), new EchoServerFactory());
+		server = new MultiplexingSessionAdapter<DefaultSessionLayerServerAdapter>(SERVER_PORT, new DefaultSessionLayerServerAdapterFactory(), new EchoServerFactory());
 		client = new ClientSessionEndpoint<DefaultSessionLayerClientAdapter>("localhost", SERVER_PORT, "123", new DefaultSessionLayerClientAdapterFactory());
 	}
 	

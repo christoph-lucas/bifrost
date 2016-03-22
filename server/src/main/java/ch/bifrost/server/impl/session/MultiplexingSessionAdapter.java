@@ -22,14 +22,14 @@ import ch.bifrost.core.api.session.SessionPacket;
 import ch.bifrost.core.api.session.SessionPacketSender;
 import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
 import ch.bifrost.core.impl.session.SessionPacketSenderImpl;
-import ch.bifrost.core.impl.session.SingleSessionEndpoint;
+import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
 import ch.bifrost.server.api.server.ServerProcess;
 import ch.bifrost.server.api.server.ServerProcessFactory;
 
 /**
  * Multiplexes a single Datagram Endpoint into several sessions. Makes sure each message is sent to the correct process.
  */
-public class MultiplexingSessionAdapter implements Closeable {
+public class MultiplexingSessionAdapter<T extends SessionLayerAdapter> implements Closeable {
 
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
@@ -37,7 +37,7 @@ public class MultiplexingSessionAdapter implements Closeable {
 	private DatagramLayerAdapter datagrams;
 	private MultiplexingReceiver receiver;
 
-	public MultiplexingSessionAdapter(int port, SessionLayerAdapterFactory sessionAdapterFactory, ServerProcessFactory serverFactory) throws SocketException {
+	public MultiplexingSessionAdapter(int port, SessionLayerAdapterFactory<T> sessionAdapterFactory, ServerProcessFactory serverFactory) throws SocketException {
 		datagrams = new UDPDatagramEndpoint(port);
 		receiver = new MultiplexingReceiver(datagrams, new SessionPacketSenderImpl(datagrams), sessionAdapterFactory, serverFactory);
 		receiver.start();
@@ -59,10 +59,10 @@ public class MultiplexingSessionAdapter implements Closeable {
 		private boolean cancelled;
 		private ExecutorService threadPool;
 		private SessionPacketSender sessionPacketSender;
-		private SessionLayerAdapterFactory sessionAdapterFactory;
+		private SessionLayerAdapterFactory<T> sessionAdapterFactory;
 		private ServerProcessFactory serverFactory;
 
-		public MultiplexingReceiver(DatagramLayerAdapter datagramEndpoint, SessionPacketSender sessionPacketSender, SessionLayerAdapterFactory sessionAdapterFactory, ServerProcessFactory serverFactory) {
+		public MultiplexingReceiver(DatagramLayerAdapter datagramEndpoint, SessionPacketSender sessionPacketSender, SessionLayerAdapterFactory<T> sessionAdapterFactory, ServerProcessFactory serverFactory) {
 			this.datagramEndpoint = datagramEndpoint;
 			this.sessionPacketSender = sessionPacketSender;
 			this.sessionAdapterFactory = sessionAdapterFactory;
@@ -89,7 +89,7 @@ public class MultiplexingSessionAdapter implements Closeable {
 				
 				if (id == null || !sessionStore.contains(id)) {
 					queue = new LinkedBlockingQueue<>();
-					SingleSessionEndpoint singleSessionEndpoint = new SingleSessionEndpoint(sessionPacketSender, queue, sessionPacket.getCounterpartAddress(), sessionPacket.getCounterpartPort());
+					SessionAdapterNetworkAccessPoint singleSessionEndpoint = new ServerSessionAdapterNetworkAccessPoint(sessionPacketSender, queue, sessionPacket.getCounterpartAddress(), sessionPacket.getCounterpartPort());
 					SessionLayerAdapter sessionAdapter = sessionAdapterFactory.newSessionLayerAdapter(singleSessionEndpoint);
 					String computedId = sessionAdapter.computeId(sessionPacket);
 					ServerProcess newServerProcess = serverFactory.newServerProcess(sessionAdapter);
