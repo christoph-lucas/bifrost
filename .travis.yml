@@ -3,7 +3,9 @@ language: java
 jdk:
   - oraclejdk8
 
-script: cd master && ./gradlew build
+script:
+  - cd master
+  - ./gradlew build
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
