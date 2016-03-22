@@ -4,30 +4,26 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeUnit;
 
-import ch.bifrost.core.api.datagram.DatagramEndpoint;
+import com.google.common.base.Optional;
+
+import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
 import ch.bifrost.core.api.datagram.Packet;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Implementation of {@link DatagramEndpoint} for UDP.
+ * Implementation of {@link DatagramLayerAdapter} for UDP.
  */
-public class UDPDatagramEndpoint implements DatagramEndpoint {
+public class UDPDatagramEndpoint implements DatagramLayerAdapter {
 
-	@Getter
-	@Setter
-	private int socketTimeoutInMs = 1000;
-	
 	@Getter
 	@Setter
 	private int receiverBufferSizeInBytes = 1024;
 	
 	private DatagramSocket socket;
-	private BlockingQueue<Packet> receivedPackets = new LinkedBlockingQueue<>();
-	private Receiver receiver;
 
 	/**
 	 * Create an endpoint that listens on a specific port (usually required for the server). 
@@ -36,7 +32,6 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 	 */
 	public UDPDatagramEndpoint(int port) throws SocketException {
 		socket = new DatagramSocket(port);
-		initialize();
 	}
 
 	/**
@@ -45,23 +40,10 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 	 */
 	public UDPDatagramEndpoint() throws SocketException {
 		socket = new DatagramSocket();
-		initialize();
-	}
-	
-	private void initialize() throws SocketException {
-		socket.setSoTimeout(socketTimeoutInMs);
-		receiver = new Receiver(socket, receivedPackets);
-		receiver.start();
 	}
 	
 	@Override
 	public void close() throws IOException {
-		receiver.cancel();
-		try {
-			Thread.sleep(2*socketTimeoutInMs);
-		} catch (InterruptedException e) {
-			socket.close();
-		}
 		socket.close();
 	}
 	
@@ -71,45 +53,30 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 	}
 	
 	@Override
-	public Packet receive() throws InterruptedException {
-		return receivedPackets.take();
+	public Packet receive() throws IOException {
+		byte[] incomingBuffer = new byte[receiverBufferSizeInBytes];
+		DatagramPacket datagram = new DatagramPacket(incomingBuffer, incomingBuffer.length);
+		synchronized(socket) {
+			socket.setSoTimeout(0);
+			socket.receive(datagram);
+		}
+		return Packet.fromDatagram(datagram);
 	}
 	
-	private class Receiver extends Thread {
-		
-		private DatagramSocket localSocket;
-		private BlockingQueue<Packet> queue;
-		private boolean cancelled;
-
-		public Receiver(DatagramSocket socket, BlockingQueue<Packet> queue) {
-			localSocket = socket;
-			this.queue = queue;
-		}
-		
-		@Override
-		public void run() {
-			while(!cancelled) {
-				byte[] incomingBuffer = new byte[receiverBufferSizeInBytes];
-				DatagramPacket datagram = new DatagramPacket(incomingBuffer, incomingBuffer.length);
-				try {
-					localSocket.receive(datagram);
-				} catch (IOException e) {
-					continue;
-				}
-				Packet packet = Packet.fromDatagram(datagram);
-				try {
-					queue.put(packet);
-				} catch (InterruptedException e) {
-					System.out.println("Got interrupted and therefore lost a packet.");
-				}
+	@Override
+	public Optional<Packet> receive(long timeout, TimeUnit unit) throws IOException {
+		long socketTimeoutInMs = unit.toMillis(timeout);
+		byte[] incomingBuffer = new byte[receiverBufferSizeInBytes];
+		DatagramPacket datagram = new DatagramPacket(incomingBuffer, incomingBuffer.length);
+		synchronized(socket) {
+			socket.setSoTimeout(Long.valueOf(socketTimeoutInMs).intValue());
+			try {
+				socket.receive(datagram);
+			} catch (SocketTimeoutException e) {
+				return Optional.absent();
 			}
 		}
-		
-		public void cancel() {
-			cancelled = true;
-		}
-		
+		return Optional.of(Packet.fromDatagram(datagram));
 	}
-	
 
 }

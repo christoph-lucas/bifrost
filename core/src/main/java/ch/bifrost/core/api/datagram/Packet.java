@@ -9,12 +9,16 @@ import org.bouncycastle.util.Arrays;
 import com.google.common.base.Charsets;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
- * Represents packets with String-Content that can be sent over an {@link DatagramEndpoint}.
+ * Represents datagram packets with String-Content that can be sent over an {@link DatagramLayerAdapter}.
  */
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@EqualsAndHashCode
+@ToString
 public class Packet {
 	@Getter
 	private InetAddress counterpartAddress;
