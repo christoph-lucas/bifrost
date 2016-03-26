@@ -6,7 +6,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
+import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.session.Message;
 import ch.bifrost.core.api.session.SessionLayerAdapter;
 import ch.bifrost.core.api.session.SessionLayerAdapterFactory;
@@ -21,7 +21,7 @@ public class ClientSessionEndpoint<T extends SessionLayerAdapter> implements Clo
 	public static final long TIMEOUT = 100L;
 
 	private T sessionAdapter;
-	private DatagramLayerAdapter datagramEndpoint;
+	private DatagramEndpoint datagramEndpoint;
 
 	public ClientSessionEndpoint(String serverHost, int serverPort, String sessionId, SessionLayerAdapterFactory<T> factory) throws UnknownHostException, SocketException {
 		datagramEndpoint = new UDPDatagramEndpoint();

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
-import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
+import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.Packet;
 import ch.bifrost.core.api.session.SessionLayerAdapter;
 import ch.bifrost.core.api.session.SessionLayerAdapterFactory;
@@ -34,7 +34,7 @@ public class MultiplexingSessionAdapter<T extends SessionLayerAdapter> implement
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 	
-	private DatagramLayerAdapter datagrams;
+	private DatagramEndpoint datagrams;
 	private MultiplexingReceiver receiver;
 
 	public MultiplexingSessionAdapter(int port, SessionLayerAdapterFactory<T> sessionAdapterFactory, ServerProcessFactory serverFactory) throws SocketException {
@@ -54,7 +54,7 @@ public class MultiplexingSessionAdapter<T extends SessionLayerAdapter> implement
 	    private final Logger LOG = LoggerFactory.getLogger(MultiplexingReceiver.class);
 
 	    private static final int NUM_THREADS = 10;
-		private DatagramLayerAdapter datagramEndpoint;
+		private DatagramEndpoint datagramEndpoint;
 		private SessionStore sessionStore = new SessionStore();
 		private boolean cancelled;
 		private ExecutorService threadPool;
@@ -62,7 +62,7 @@ public class MultiplexingSessionAdapter<T extends SessionLayerAdapter> implement
 		private SessionLayerAdapterFactory<T> sessionAdapterFactory;
 		private ServerProcessFactory serverFactory;
 
-		public MultiplexingReceiver(DatagramLayerAdapter datagramEndpoint, SessionPacketSender sessionPacketSender, SessionLayerAdapterFactory<T> sessionAdapterFactory, ServerProcessFactory serverFactory) {
+		public MultiplexingReceiver(DatagramEndpoint datagramEndpoint, SessionPacketSender sessionPacketSender, SessionLayerAdapterFactory<T> sessionAdapterFactory, ServerProcessFactory serverFactory) {
 			this.datagramEndpoint = datagramEndpoint;
 			this.sessionPacketSender = sessionPacketSender;
 			this.sessionAdapterFactory = sessionAdapterFactory;

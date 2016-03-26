@@ -9,15 +9,15 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 
-import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
+import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.Packet;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Implementation of {@link DatagramLayerAdapter} for UDP.
+ * Implementation of {@link DatagramEndpoint} for UDP.
  */
-public class UDPDatagramEndpoint implements DatagramLayerAdapter {
+public class UDPDatagramEndpoint implements DatagramEndpoint {
 
 	@Getter
 	@Setter

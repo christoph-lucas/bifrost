@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * Represents datagram packets with String-Content that can be sent over an {@link DatagramLayerAdapter}.
+ * Represents datagram packets with String-Content that can be sent over an {@link DatagramEndpoint}.
  */
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @EqualsAndHashCode

@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 
-import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
+import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.Packet;
 import ch.bifrost.core.api.session.SessionPacket;
 import ch.bifrost.core.api.session.SessionPacketSender;
@@ -14,9 +14,9 @@ import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
 
 public class ClientSessionAdapterNetworkAccessPoint extends SessionAdapterNetworkAccessPoint {
 
-	private DatagramLayerAdapter datagramEndpoint;
+	private DatagramEndpoint datagramEndpoint;
 
-	public ClientSessionAdapterNetworkAccessPoint(SessionPacketSender sessionPacketSender, InetAddress counterpartAddress, int counterpartPort, DatagramLayerAdapter datagramEndpoint) {
+	public ClientSessionAdapterNetworkAccessPoint(SessionPacketSender sessionPacketSender, InetAddress counterpartAddress, int counterpartPort, DatagramEndpoint datagramEndpoint) {
 		super(sessionPacketSender, counterpartAddress, counterpartPort);
 		this.datagramEndpoint = datagramEndpoint;
 	}

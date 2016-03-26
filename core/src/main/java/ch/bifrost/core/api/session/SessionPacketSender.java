@@ -2,10 +2,10 @@ package ch.bifrost.core.api.session;
 
 import java.io.IOException;
 
-import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
+import ch.bifrost.core.api.datagram.DatagramEndpoint;
 
 /**
- * Actually just an abstraction of a {@link DatagramLayerAdapter} for {@link SessionPacket}s.
+ * Actually just an abstraction of a {@link DatagramEndpoint} for {@link SessionPacket}s.
  */
 public interface SessionPacketSender {
 

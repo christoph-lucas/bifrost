@@ -2,15 +2,15 @@ package ch.bifrost.core.impl.session;
 
 import java.io.IOException;
 
-import ch.bifrost.core.api.datagram.DatagramLayerAdapter;
+import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.session.SessionPacket;
 import ch.bifrost.core.api.session.SessionPacketSender;
 
 public class SessionPacketSenderImpl implements SessionPacketSender {
 
-	private DatagramLayerAdapter endpoint;
+	private DatagramEndpoint endpoint;
 
-	public SessionPacketSenderImpl(DatagramLayerAdapter endpoint) {
+	public SessionPacketSenderImpl(DatagramEndpoint endpoint) {
 		this.endpoint = endpoint;
 	}
 	

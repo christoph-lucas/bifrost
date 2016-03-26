@@ -7,9 +7,9 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Optional;
 
 /**
- * An adapter on the datagram layer.
+ * An endpoint on the datagram layer.
  */
-public interface DatagramLayerAdapter extends Closeable {
+public interface DatagramEndpoint extends Closeable {
 
 	/**
 	 * Send the given packet to the address given in the packet.
