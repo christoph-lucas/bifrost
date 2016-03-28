@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
+import ch.bifrost.core.api.session.IdKeyPair;
 import ch.bifrost.core.api.session.Message;
-import ch.bifrost.core.api.session.SessionLayerAdapterFactory;
-import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
+import ch.bifrost.core.api.session.SessionConverterFactory;
+import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerAdapter;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessageHandler;
@@ -16,9 +17,9 @@ import ch.bifrost.core.impl.session.defaultImpl.RekeyHandler;
 /**
  * The server side adapter for the default session layer.
  */
-public class DefaultSessionLayerServerAdapter extends DefaultSessionLayerAdapter {
+public class DefaultServerSessionConverter extends DefaultSessionLayerAdapter {
 
-	public DefaultSessionLayerServerAdapter(SessionAdapterNetworkAccessPoint endpoint) {
+	public DefaultServerSessionConverter(NetworkEndointForSessionConverter endpoint, IdKeyPair key) {
 		super(endpoint);
 	}
 
@@ -29,11 +30,11 @@ public class DefaultSessionLayerServerAdapter extends DefaultSessionLayerAdapter
 		return handlers;
 	}
 
-	public static class DefaultSessionLayerServerAdapterFactory implements SessionLayerAdapterFactory<DefaultSessionLayerServerAdapter> {
+	public static class DefaultServerSessionConverterFactory implements SessionConverterFactory {
 		
 		@Override
-		public DefaultSessionLayerServerAdapter newSessionLayerAdapter(SessionAdapterNetworkAccessPoint endpoint) {
-			return new DefaultSessionLayerServerAdapter(endpoint);
+		public DefaultServerSessionConverter newSessionConverter(NetworkEndointForSessionConverter endpoint, IdKeyPair key) {
+			return new DefaultServerSessionConverter(endpoint, key);
 		}
 	}
 

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.session.Message;
-import ch.bifrost.core.api.session.SessionLayerAdapter;
+import ch.bifrost.core.api.session.SessionConverter;
 import ch.bifrost.server.api.server.ServerProcess;
 import ch.bifrost.server.api.server.ServerProcessFactory;
 
@@ -22,15 +22,16 @@ public class EchoServer implements ServerProcess {
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 	
-	private SessionLayerAdapter sessionEndpoint;
+	private SessionConverter sessionEndpoint;
 	private boolean cancelled;
 
-	public EchoServer(SessionLayerAdapter sessionEndpoint) {
+	public EchoServer(SessionConverter sessionEndpoint) {
 		this.sessionEndpoint = sessionEndpoint;
 	}
 	
 	@Override
 	public void run() {
+		LOG.debug("Hello from the EchoServer. I'm up and running!");
 		while(!cancelled) {
 			try {
 				Optional<Message> message = sessionEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
@@ -52,7 +53,7 @@ public class EchoServer implements ServerProcess {
 
 	public static class EchoServerFactory implements ServerProcessFactory {
 		@Override
-		public ServerProcess newServerProcess(SessionLayerAdapter sessionEndpoint) {
+		public ServerProcess newServerProcess(SessionConverter sessionEndpoint) {
 			return new EchoServer(sessionEndpoint);
 		}
 	}

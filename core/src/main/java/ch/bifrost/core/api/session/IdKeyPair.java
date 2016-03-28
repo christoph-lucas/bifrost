@@ -13,8 +13,8 @@ public class IdKeyPair {
 	private final String id;
 	private final byte[] key;
 	
-	public static IdKeyPair decode(String content) throws Exception {
-		return new ObjectMapper().readValue(content, IdKeyPair.class);
+	public static IdKeyPair decode(String payload) throws Exception {
+		return new ObjectMapper().readValue(payload, IdKeyPair.class);
 	}
 	
 	public String encode() throws JsonProcessingException {

@@ -6,9 +6,9 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Optional;
 
 /**
- * An abstraction of the session layer. A {@link SessionLayerAdapter} together with a (SingleSession- or Multiplexing) Receiver turns a datagram endpoint into a session endpoint.
+ * An abstraction of the session layer. A {@link SessionConverter} together with a (SingleSession- or Multiplexing) Receiver turns a datagram endpoint into a session endpoint.
  */
-public interface SessionLayerAdapter {
+public interface SessionConverter {
 
 	/**
 	 * Send the message to the communication partner in this session.
@@ -31,11 +31,4 @@ public interface SessionLayerAdapter {
 	 */
 	Optional<Message> receive(long timeout, TimeUnit unit) throws Exception;
 
-	/**
-	 * Messages belonging to this adapter have to be recognized by an ID. This ID has to be computed from
-	 * the first message, so that the second message can be delivered to this adapter. 
-	 * @return an id
-	 */
-	String computeId(SessionPacket firstMessage);
-	
 }

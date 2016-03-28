@@ -8,9 +8,10 @@ import java.util.concurrent.BlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.bifrost.core.api.session.IdKeyPair;
 import ch.bifrost.core.api.session.Message;
-import ch.bifrost.core.api.session.SessionLayerAdapterFactory;
-import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
+import ch.bifrost.core.api.session.SessionConverterFactory;
+import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerAdapter;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessage;
@@ -21,11 +22,11 @@ import ch.bifrost.core.impl.session.defaultImpl.RekeyReplyHandler;
 /**
  * The client side adapter for the default session layer.
  */
-public class DefaultSessionLayerClientAdapter extends DefaultSessionLayerAdapter {
+public class DefaultClientSessionConverter extends DefaultSessionLayerAdapter {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerClientAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DefaultClientSessionConverter.class);
 
-	public DefaultSessionLayerClientAdapter(SessionAdapterNetworkAccessPoint networkAccessPoint) {
+	public DefaultClientSessionConverter(NetworkEndointForSessionConverter networkAccessPoint) {
 		super(networkAccessPoint);
 	}
 
@@ -44,11 +45,11 @@ public class DefaultSessionLayerClientAdapter extends DefaultSessionLayerAdapter
 		getSender().send(new DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY, "Whatever..."));
 	}
 	
-	public static class DefaultSessionLayerClientAdapterFactory implements SessionLayerAdapterFactory<DefaultSessionLayerClientAdapter> {
+	public static class DefaultClientSessionConverterFactory implements SessionConverterFactory {
 		
 		@Override
-		public DefaultSessionLayerClientAdapter newSessionLayerAdapter(SessionAdapterNetworkAccessPoint networkAccessPoint) {
-			return new DefaultSessionLayerClientAdapter(networkAccessPoint);
+		public DefaultClientSessionConverter newSessionConverter(NetworkEndointForSessionConverter networkAccessPoint, IdKeyPair key) {
+			return new DefaultClientSessionConverter(networkAccessPoint);
 		}
 	}
 

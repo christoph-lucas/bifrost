@@ -9,24 +9,30 @@ import com.google.common.base.Optional;
 import ch.bifrost.core.api.session.Message;
 import ch.bifrost.core.api.session.SessionPacket;
 import ch.bifrost.core.api.session.SessionPacketSender;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-public abstract class SessionAdapterNetworkAccessPoint {
+@Accessors(fluent = true)
+public abstract class NetworkEndointForSessionConverter {
 
 	private final SessionPacketSender sessionPacketSender;
-	private final InetAddress counterpartAddress;
-	private final int counterpartPort;
-	private String sessionId;
+	private final String sessionId;
+	@Getter
+	@Setter
+	private InetAddress counterpartAddress;
+	@Getter
+	@Setter
+	private int counterpartPort;
 
-	public SessionAdapterNetworkAccessPoint(SessionPacketSender sessionPacketSender, InetAddress counterpartAddress, int counterpartPort) {
+	public NetworkEndointForSessionConverter(SessionPacketSender sessionPacketSender, String sessionId) {
 		this.sessionPacketSender = sessionPacketSender;
-		this.counterpartAddress = counterpartAddress;
-		this.counterpartPort = counterpartPort;
+		this.sessionId = sessionId;
 	}
 	
-	protected abstract SessionPacket receiveWithoutTimeout() throws Exception;
+	protected abstract SessionPacket internalReceive() throws Exception;
 
-	protected abstract Optional<SessionPacket> receiveWithTimeout(long timeout, TimeUnit unit) throws Exception;
-
+	protected abstract Optional<SessionPacket> internalReceive(long timeout, TimeUnit unit) throws Exception;
 	
 	/**
 	 * Send the message to the communication partner in this session.
@@ -34,6 +40,9 @@ public abstract class SessionAdapterNetworkAccessPoint {
 	 * @throws IOException thrown if an error occurrs
 	 */
 	public void send(Message message) throws IOException {
+		if (counterpartAddress == null || counterpartPort == 0) {
+			throw new IllegalStateException("CounterpartAddress or port not set, cannot send message.");
+		}
 		SessionPacket sessionPacket = new SessionPacket(counterpartAddress, counterpartPort, sessionId, message.getContent());
 		sessionPacketSender.send(sessionPacket);
 	}
@@ -44,11 +53,8 @@ public abstract class SessionAdapterNetworkAccessPoint {
 	 */
 	public Message receive() throws Exception {
 		while (true) { // run until we have a valid message
-			SessionPacket sessionPacket = receiveWithoutTimeout();
-			if (sessionId == null) {
-				sessionId = sessionPacket.getSessionId();
-			}
-			if (counterpartAddress.equals(sessionPacket.getCounterpartAddress()) && counterpartPort == sessionPacket.getCounterpartPort() && sessionId.equals(sessionPacket.getSessionId())) {
+			SessionPacket sessionPacket = internalReceive();
+			if (sessionId.equals(sessionPacket.getSessionId())) {
 				return new Message(sessionPacket.getContent());
 			}
 		}
@@ -60,14 +66,11 @@ public abstract class SessionAdapterNetworkAccessPoint {
 	 * @throws Exception thrown if something went wrong 
 	 */
 	public Optional<Message> receive(long timeout, TimeUnit unit) throws Exception {
-		Optional<SessionPacket> sessionPacket = receiveWithTimeout(timeout, unit);
+		Optional<SessionPacket> sessionPacket = internalReceive(timeout, unit);
 		if (!sessionPacket.isPresent()) {
 			return Optional.absent();
 		}
-		if (sessionId == null) {
-			sessionId = sessionPacket.get().getSessionId();
-		}
-		if (counterpartAddress.equals(sessionPacket.get().getCounterpartAddress()) && counterpartPort == sessionPacket.get().getCounterpartPort() && sessionId.equals(sessionPacket.get().getSessionId())) {
+		if (sessionId.equals(sessionPacket.get().getSessionId())) {
 			return Optional.of(new Message(sessionPacket.get().getContent()));
 		}
 		// received a message with wrong counterpart, return even if the timeout is not yet over

@@ -4,7 +4,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import ch.bifrost.core.api.session.SessionPacket;
-import ch.bifrost.server.api.server.ServerProcess;
 
 /**
  * Stores all sessions with an attached state.
@@ -17,11 +16,10 @@ public class SessionStore {
 		return store.containsKey(id);
 	}
 	
-	public void put(String id, BlockingQueue<SessionPacket> packetReceiverQueue, ServerProcess process) {
+	public void put(String id, BlockingQueue<SessionPacket> packetReceiverQueue) {
 		store.put(id, SessionState.builder()
 				.id(id)
 				.receivedPackages(packetReceiverQueue)
-				.serverProcess(process)
 				.alive(true)
 				.build());
 	}

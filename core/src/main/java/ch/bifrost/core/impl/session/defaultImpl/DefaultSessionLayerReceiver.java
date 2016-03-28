@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.session.Message;
-import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
+import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 
 /**
  * A receiver thread within the default session layer. Distinguishes between the different sorts of messages and handles
@@ -24,12 +24,12 @@ public class DefaultSessionLayerReceiver extends Thread {
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 
-	private SessionAdapterNetworkAccessPoint endpoint;
+	private NetworkEndointForSessionConverter endpoint;
 	private boolean cancelled;
 	private Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers;
 	private final ObjectMapper json = new ObjectMapper();
 
-	public DefaultSessionLayerReceiver(SessionAdapterNetworkAccessPoint endpoint, Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers) {
+	public DefaultSessionLayerReceiver(NetworkEndointForSessionConverter endpoint, Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers) {
 		this.endpoint = endpoint;
 		this.handlers = handlers;
 	}
