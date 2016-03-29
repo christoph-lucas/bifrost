@@ -3,6 +3,7 @@ package ch.bifrost.client.impl.session;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
@@ -13,32 +14,37 @@ import ch.bifrost.core.api.session.KeyExchange;
 import ch.bifrost.core.api.session.Message;
 import ch.bifrost.core.api.session.SessionConverter;
 import ch.bifrost.core.api.session.SessionConverterFactory;
+import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 import ch.bifrost.core.impl.session.SessionPacketSenderImpl;
 
 /**
- * Plugs everything together for a client.
+ * A helper class that plugs everything together for a client on the session layer.
  */
-public class ClientSessionEndpoint implements Closeable {
-
-	public static final long TIMEOUT = 100L;
+public class SessionClient implements Closeable {
 
 	private final KeyExchange keyExchange;
 	private final SessionConverterFactory sessionConverterFactory;
+	private final InetAddress serverHost;
+	private final int serverPort;
+
+	private final DatagramEndpoint clientPayloadDatagramEndpoint;
+	private final UDPDatagramEndpoint clientKeyExchangeDatagramEndpoint;
+
 	private boolean sessionInitialized = false;
 	private SessionConverter sessionConverter;
-	private DatagramEndpoint clientPayloadDatagramEndpoint;
-	private InetAddress serverHost;
-	private int serverPort;
-	
 
-	public ClientSessionEndpoint(KeyExchange keyExchange, SessionConverterFactory sessionConverterFactory, DatagramEndpoint clientPayloadDatagramEndpoint, InetAddress serverHost, int serverPort) {
-		this.keyExchange = keyExchange;
-		this.sessionConverterFactory = sessionConverterFactory;
-		this.clientPayloadDatagramEndpoint = clientPayloadDatagramEndpoint;
+	public SessionClient(InetAddress serverHost, int serverKeyExchangePort, int serverPayloadPort, SessionConverterFactory sessionConverterFactory) throws SocketException {
 		this.serverHost = serverHost;
-		this.serverPort = serverPort;
+		serverPort = serverPayloadPort;
+		this.sessionConverterFactory = sessionConverterFactory;
+		
+		clientKeyExchangeDatagramEndpoint = new UDPDatagramEndpoint();
+		keyExchange = new KeyExchangeClient(clientKeyExchangeDatagramEndpoint, serverHost, serverKeyExchangePort);
+		
+		clientPayloadDatagramEndpoint = new UDPDatagramEndpoint();
 	}
+	
 	
 	public SessionConverter initializeSession(long timeout, TimeUnit unit) throws Exception {
 		if (sessionInitialized) {
@@ -72,6 +78,8 @@ public class ClientSessionEndpoint implements Closeable {
 		if (sessionConverter instanceof Closeable) {
 			((Closeable) sessionConverter).close();
 		}
+		clientKeyExchangeDatagramEndpoint.close();
+		clientPayloadDatagramEndpoint.close();
 	}
 
 }
