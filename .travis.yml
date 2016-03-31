@@ -6,7 +6,7 @@ jdk:
 script:
   - cd master
   - ./gradlew build
-  - ./gradlew test
+  - ./gradlew -Djava.net.preferIPv4Stack=true test
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
