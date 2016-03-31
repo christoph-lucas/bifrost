@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,15 +15,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.session.Message;
+import ch.bifrost.core.api.session.SessionConverter;
 import ch.bifrost.core.api.session.SessionException;
-import ch.bifrost.core.api.session.SessionLayerAdapter;
-import ch.bifrost.core.api.session.SessionPacket;
-import ch.bifrost.core.impl.session.SessionAdapterNetworkAccessPoint;
+import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 
 /**
  * The default implementation of the session layer as proposed in the paper. Serves as a base class for both client and server.
  */
-public abstract class DefaultSessionLayerAdapter implements SessionLayerAdapter, Closeable {
+public abstract class DefaultSessionLayerAdapter implements SessionConverter, Closeable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerAdapter.class);
 
@@ -36,7 +33,7 @@ public abstract class DefaultSessionLayerAdapter implements SessionLayerAdapter,
 	private final DefaultSessionLayerReceiver receiver;
 	private DefaultSessionLayerMessageSender sender; 
 
-	public DefaultSessionLayerAdapter(SessionAdapterNetworkAccessPoint networkAccessPoint) {
+	public DefaultSessionLayerAdapter(NetworkEndointForSessionConverter networkAccessPoint) {
 		sender = new DefaultSessionLayerMessageSender(networkAccessPoint);
 		receiver = new DefaultSessionLayerReceiver(networkAccessPoint, getMessageHandlers(sender, queueTowardsUpperLayer));
 		receiver.start();
@@ -74,12 +71,6 @@ public abstract class DefaultSessionLayerAdapter implements SessionLayerAdapter,
 	}
 
 	@Override
-	public String computeId(SessionPacket firstMessage) {
-		// TODO should depend somehow on the key
-		return ThreadLocalRandom.current().ints(0, 9).limit(30).mapToObj(Integer::toString).collect(Collectors.joining());
-	}
-	
-	@Override
 	public void close() throws IOException {
 		receiver.cancel();
 	}
@@ -88,10 +79,10 @@ public abstract class DefaultSessionLayerAdapter implements SessionLayerAdapter,
 		
 		private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerMessageSender.class);
 	
-		private final SessionAdapterNetworkAccessPoint endpoint;
+		private final NetworkEndointForSessionConverter endpoint;
 		private final ObjectMapper mapper;
 
-		public DefaultSessionLayerMessageSender(SessionAdapterNetworkAccessPoint networkAccessPoint) {
+		public DefaultSessionLayerMessageSender(NetworkEndointForSessionConverter networkAccessPoint) {
 			this.endpoint = networkAccessPoint;
 			mapper = new ObjectMapper();
 		}
