@@ -7,16 +7,16 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
-import ch.bifrost.core.api.datagram.Packet;
-import ch.bifrost.core.api.session.SessionPacket;
-import ch.bifrost.core.api.session.SessionPacketSender;
+import ch.bifrost.core.api.datagram.DatagramMessage;
+import ch.bifrost.core.api.session.SessionInternalMessage;
+import ch.bifrost.core.api.session.SessionInternalMessageSender;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 
 public class ClientNetworkEndpointForSessionConverter extends NetworkEndointForSessionConverter {
 
 	private DatagramEndpoint datagramEndpoint;
 
-	public ClientNetworkEndpointForSessionConverter(SessionPacketSender sessionPacketSender, InetAddress serverAddress, int serverPort, DatagramEndpoint datagramEndpoint, String sessionId) {
+	public ClientNetworkEndpointForSessionConverter(SessionInternalMessageSender sessionPacketSender, InetAddress serverAddress, int serverPort, DatagramEndpoint datagramEndpoint, String sessionId) {
 		super(sessionPacketSender, sessionId);
 		super.counterpartAddress(serverAddress);
 		super.counterpartPort(serverPort);
@@ -24,16 +24,16 @@ public class ClientNetworkEndpointForSessionConverter extends NetworkEndointForS
 	}
 
 	@Override
-	protected SessionPacket internalReceive() throws IOException {
-			Packet receivedPacket = datagramEndpoint.receive();
-			return SessionPacket.fromPacket(receivedPacket);
+	protected SessionInternalMessage internalReceive() throws IOException {
+			DatagramMessage receivedPacket = datagramEndpoint.receive();
+			return SessionInternalMessage.from(receivedPacket);
 	}
 
 	@Override
-	protected Optional<SessionPacket> internalReceive(long timeout, TimeUnit unit) throws IOException {
-		Optional<Packet> receivedPacket = datagramEndpoint.receive(timeout, unit);
+	protected Optional<SessionInternalMessage> internalReceive(long timeout, TimeUnit unit) throws IOException {
+		Optional<DatagramMessage> receivedPacket = datagramEndpoint.receive(timeout, unit);
 		if (receivedPacket.isPresent()) {
-			return Optional.of(SessionPacket.fromPacket(receivedPacket.get()));
+			return Optional.of(SessionInternalMessage.from(receivedPacket.get()));
 		}
 		return Optional.absent();
 	}

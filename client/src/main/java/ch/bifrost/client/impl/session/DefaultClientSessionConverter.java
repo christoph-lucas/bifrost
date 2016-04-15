@@ -9,8 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.bifrost.core.api.session.IdKeyPair;
-import ch.bifrost.core.api.session.Message;
+import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.api.session.SessionConverterFactory;
+import ch.bifrost.core.impl.MessageCodecUtils;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerAdapter;
@@ -30,7 +31,7 @@ public class DefaultClientSessionConverter extends DefaultSessionLayerAdapter {
 		super(networkAccessPoint);
 	}
 
-	protected Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers(DefaultSessionLayerMessageSender sender, BlockingQueue<Message> queueTowardsUpperLayer) {
+	protected Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers(DefaultSessionLayerMessageSender sender, BlockingQueue<SessionMessage> queueTowardsUpperLayer) {
 		Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers = new HashMap<>();
 		handlers.put(DefaultSessionLayerMessageIdentifier.DATA_PAYLOAD, new DataPayloadHandler(queueTowardsUpperLayer));
 		handlers.put(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY_REPLY, new RekeyReplyHandler());
@@ -42,7 +43,8 @@ public class DefaultClientSessionConverter extends DefaultSessionLayerAdapter {
 	 */
 	public void rekey() throws IOException {
 		LOG.debug("Sending rekey message to server");
-		getSender().send(new DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY, "Whatever..."));
+		byte[] messageBytes = MessageCodecUtils.encodeStringAsByteArray("Whatever...");
+		getSender().send(new DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY, messageBytes));
 	}
 	
 	public static class DefaultClientSessionConverterFactory implements SessionConverterFactory {

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.bifrost.core.impl.MessageCodecUtils;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerAdapter.DefaultSessionLayerMessageSender;
 
 /**
@@ -24,7 +25,8 @@ public class RekeyHandler implements DefaultSessionLayerMessageHandler {
 	public void handle(DefaultSessionLayerMessage message) throws IOException {
 		LOG.debug("Received Rekey Message");
 		// for now not much
-		sender.send(new DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY_REPLY, "I did a rekeying as asked to do."));
+		byte[] messageBytes = MessageCodecUtils.encodeStringAsByteArray("I did a rekeying as asked to do.");
+		sender.send(new DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY_REPLY, messageBytes));
 	}
 
 }

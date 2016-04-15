@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.session.IdKeyPair;
-import ch.bifrost.core.api.session.Message;
+import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.api.session.SessionConverter;
 import ch.bifrost.core.api.session.SessionConverterFactory;
 
@@ -22,17 +22,17 @@ public class NoCryptoSessionConverter implements SessionConverter {
 	}
 	
 	@Override
-	public void send(Message message) throws IOException {
+	public void send(SessionMessage message) throws IOException {
 		networkAccessPoint.send(message);
 	}
 
 	@Override
-	public Message receive() throws Exception {
+	public SessionMessage receive() throws Exception {
 		return networkAccessPoint.receive();
 	}
 
 	@Override
-	public Optional<Message> receive(long timeout, TimeUnit unit) throws Exception {
+	public Optional<SessionMessage> receive(long timeout, TimeUnit unit) throws Exception {
 		return networkAccessPoint.receive(timeout, unit);
 	}
 

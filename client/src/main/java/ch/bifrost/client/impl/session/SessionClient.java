@@ -10,12 +10,12 @@ import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.session.IdKeyPair;
-import ch.bifrost.core.api.session.Message;
+import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.api.session.SessionConverter;
 import ch.bifrost.core.api.session.SessionConverterFactory;
 import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
-import ch.bifrost.core.impl.session.SessionPacketSenderImpl;
+import ch.bifrost.core.impl.session.SessionInternalMessageSenderImpl;
 
 /**
  * A helper class that plugs everything together for a client on the session layer.
@@ -54,21 +54,21 @@ public class SessionClient implements Closeable {
 			throw new RuntimeException("something happened");
 		}
 		IdKeyPair idKeyPair = optional.get();
-		SessionPacketSenderImpl payloadSender = new SessionPacketSenderImpl(clientPayloadDatagramEndpoint);
+		SessionInternalMessageSenderImpl payloadSender = new SessionInternalMessageSenderImpl(clientPayloadDatagramEndpoint);
 		NetworkEndointForSessionConverter networkAccessPoint = new ClientNetworkEndpointForSessionConverter(payloadSender, serverHost, serverPort, clientPayloadDatagramEndpoint, idKeyPair.getId());
 		sessionConverter = sessionConverterFactory.newSessionConverter(networkAccessPoint, idKeyPair);
 		sessionInitialized = true;
 		return sessionConverter;
 	}
 	
-	public void send(Message message) throws IOException {
+	public void send(SessionMessage message) throws IOException {
 		if (!sessionInitialized) {
 			throw new IllegalStateException("Session not yet initialized.");
 		}
 		sessionConverter.send(message);
 	}
 
-	public Message receive() throws Exception {
+	public SessionMessage receive() throws Exception {
 		return sessionConverter.receive();
 	}
 

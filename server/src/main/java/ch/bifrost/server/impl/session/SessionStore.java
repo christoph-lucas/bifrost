@@ -3,7 +3,7 @@ package ch.bifrost.server.impl.session;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ch.bifrost.core.api.session.SessionPacket;
+import ch.bifrost.core.api.session.SessionInternalMessage;
 
 /**
  * Stores all sessions with an attached state.
@@ -16,7 +16,7 @@ public class SessionStore {
 		return store.containsKey(id);
 	}
 	
-	public void put(String id, BlockingQueue<SessionPacket> packetReceiverQueue) {
+	public void put(String id, BlockingQueue<SessionInternalMessage> packetReceiverQueue) {
 		store.put(id, SessionState.builder()
 				.id(id)
 				.receivedPackages(packetReceiverQueue)

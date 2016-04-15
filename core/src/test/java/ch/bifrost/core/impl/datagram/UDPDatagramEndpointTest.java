@@ -8,14 +8,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.bifrost.core.api.datagram.Packet;
+import ch.bifrost.core.api.datagram.DatagramMessage;
+import ch.bifrost.core.impl.MessageCodecUtils;
 
 public class UDPDatagramEndpointTest {
 	
 	private final String SERVER_HOST = "localhost";
 	private final int SERVER_PORT = 34543;
-	private final String CLIENT_MESSAGE = "Hello World!";
-	private final String SERVER_MESSAGE = "Hello Client!";
+	private final byte[] CLIENT_MESSAGE = MessageCodecUtils.encodeStringAsByteArray("Hello World!");
+	private final byte[] SERVER_MESSAGE = MessageCodecUtils.encodeStringAsByteArray("Hello Client!");
 	private UDPDatagramEndpoint serverEndpoint;
 	private UDPDatagramEndpoint clientEndpoint;
 
@@ -33,25 +34,25 @@ public class UDPDatagramEndpointTest {
 	
 	@Test
 	public void shouldReceiveWhatWasSent() throws Exception {
-		Packet outgoing = new Packet(SERVER_HOST, SERVER_PORT, CLIENT_MESSAGE);
+		DatagramMessage outgoing = new DatagramMessage(SERVER_HOST, SERVER_PORT, CLIENT_MESSAGE);
 
 		clientEndpoint.send(outgoing);
-		Packet incoming = serverEndpoint.receive();
+		DatagramMessage incoming = serverEndpoint.receive();
 
-		assertThat(incoming.getContent(), is(equalTo(CLIENT_MESSAGE)));
+		assertThat(incoming.getPayload(), is(equalTo(CLIENT_MESSAGE)));
 	}
 	
 	@Test
 	public void shouldBeAbleToReply() throws Exception {
-		Packet message = new Packet(SERVER_HOST, SERVER_PORT, CLIENT_MESSAGE);
+		DatagramMessage message = new DatagramMessage(SERVER_HOST, SERVER_PORT, CLIENT_MESSAGE);
 		clientEndpoint.send(message);
 
-		Packet incoming = serverEndpoint.receive();
-		Packet reply = new Packet(incoming.getCounterpartAddress(), incoming.getCounterpartPort(), SERVER_MESSAGE);
+		DatagramMessage incoming = serverEndpoint.receive();
+		DatagramMessage reply = new DatagramMessage(incoming.getCounterpartAddress(), incoming.getCounterpartPort(), SERVER_MESSAGE);
 		serverEndpoint.send(reply);
 		
-		Packet incomingReply = clientEndpoint.receive();
-		assertThat(incomingReply.getContent(), is(equalTo(SERVER_MESSAGE)));
+		DatagramMessage incomingReply = clientEndpoint.receive();
+		assertThat(incomingReply.getPayload(), is(equalTo(SERVER_MESSAGE)));
 	}
 
 }

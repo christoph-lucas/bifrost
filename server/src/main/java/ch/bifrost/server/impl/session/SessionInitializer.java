@@ -20,7 +20,8 @@ import ch.bifrost.server.api.server.ServerProcessFactory;
 
 public class SessionInitializer extends Thread {
 		
-	    private static final Logger LOG = LoggerFactory.getLogger(SessionInitializer.class);
+		private static final Logger LOG = LoggerFactory.getLogger(SessionInitializer.class);
+		
 	    private static final int NUM_THREADS = 10;
 	    private static final long TIMEOUT = 100L;
 	    private static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
@@ -72,7 +73,7 @@ public class SessionInitializer extends Thread {
 		}
 		
 		private String createRandomId() {
-			return ThreadLocalRandom.current().ints(0, 9).limit(30).mapToObj(Integer::toString).collect(Collectors.joining());
+			return ThreadLocalRandom.current().ints(0, 9).limit(SessionConverter.SESSION_ID_LENGTH_IN_BYTES).mapToObj(Integer::toString).collect(Collectors.joining());
 		}
 		
 		public void cancel() {

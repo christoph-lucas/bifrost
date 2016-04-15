@@ -27,7 +27,8 @@ public class KeyExchangeTest {
 
 	private static InetAddress SERVER_HOST;
 	private static final int SERVER_PORT = 4567;
-	private static final String ID = "123";
+	// ID must be 32 bytes
+	private static final String ID = "01234567890123456789012345678912";
 
 	@BeforeClass
 	public static void setupLogger() throws Exception {

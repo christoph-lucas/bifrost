@@ -10,25 +10,27 @@ import com.google.common.base.Optional;
  */
 public interface SessionConverter {
 
+    public static final int SESSION_ID_LENGTH_IN_BYTES = 32;
+	
 	/**
 	 * Send the message to the communication partner in this session.
 	 * @param message the message to be sent
 	 * @throws IOException thrown if an error occurrs
 	 */
-	void send(Message message) throws IOException;
+	void send(SessionMessage message) throws IOException;
 	
 	/**
 	 * Blocking call to receive the next message.
 	 * @return the next message
 	 * @throws Exception thrown if something went wrong 
 	 */
-	Message receive() throws Exception;
+	SessionMessage receive() throws Exception;
 
 	/**
 	 * Blocking call to receive the next message, waiting at most for the timeout.
 	 * @return the next message or null if timeout exceeded
 	 * @throws Exception thrown if something went wrong 
 	 */
-	Optional<Message> receive(long timeout, TimeUnit unit) throws Exception;
+	Optional<SessionMessage> receive(long timeout, TimeUnit unit) throws Exception;
 
 }

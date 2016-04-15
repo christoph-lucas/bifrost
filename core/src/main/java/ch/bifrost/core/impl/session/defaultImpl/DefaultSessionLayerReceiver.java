@@ -7,10 +7,9 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 
-import ch.bifrost.core.api.session.Message;
+import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 
 /**
@@ -27,7 +26,6 @@ public class DefaultSessionLayerReceiver extends Thread {
 	private NetworkEndointForSessionConverter endpoint;
 	private boolean cancelled;
 	private Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers;
-	private final ObjectMapper json = new ObjectMapper();
 
 	public DefaultSessionLayerReceiver(NetworkEndointForSessionConverter endpoint, Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers) {
 		this.endpoint = endpoint;
@@ -37,7 +35,7 @@ public class DefaultSessionLayerReceiver extends Thread {
 	@Override
 	public void run() {
 		while(!cancelled) {
-			Optional<Message> receivedMessage;
+			Optional<SessionMessage> receivedMessage;
 			try {
 				receivedMessage = endpoint.receive(TIMEOUT, TIMEOUT_UNIT);
 			} catch (Exception e) {
@@ -49,7 +47,7 @@ public class DefaultSessionLayerReceiver extends Thread {
 			}
 			try {
 				LOG.debug("Received a message. Converting to DefaultSessionLayerMessage.");
-				DefaultSessionLayerMessage sessionLayerMessage = json.readValue(receivedMessage.get().getContent(), DefaultSessionLayerMessage.class);
+				DefaultSessionLayerMessage sessionLayerMessage = DefaultSessionLayerMessage.from(receivedMessage.get()); 
 				LOG.debug("Looking for handler.");
 				DefaultSessionLayerMessageHandler handler = handlers.get(sessionLayerMessage.getIdentifier());
 				if (handler != null) {

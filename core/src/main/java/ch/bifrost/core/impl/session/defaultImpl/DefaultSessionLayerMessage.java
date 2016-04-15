@@ -1,33 +1,39 @@
 package ch.bifrost.core.impl.session.defaultImpl;
 
-import java.io.IOException;
+import org.apache.commons.lang3.ArrayUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ch.bifrost.core.api.session.Message;
-import ch.bifrost.core.api.session.SessionException;
+import ch.bifrost.core.api.session.SessionMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * Represents the messages within the default session layer.
+ * 
+ * FORMAT: DefaultSessionLayerMessageIdentifier (1 byte) | payload
  */
 @Data
 @AllArgsConstructor
 public class DefaultSessionLayerMessage {
 
 	private final DefaultSessionLayerMessageIdentifier identifier;
-	private final String payload;
+	private final byte[] payload;
 
 	
-	public static DefaultSessionLayerMessage fromMessage(Message message) {
-		String rawContent = message.getContent();
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			return mapper.readValue(rawContent, DefaultSessionLayerMessage.class);
-		} catch (IOException e) {
-			throw new SessionException("Cannot decode DefaultSessionLayerMessage from Json.", e);
-		}
+	public static DefaultSessionLayerMessage from(SessionMessage message) {
+		byte[] byteRepresentation = message.getPayload();
+		
+		byte[] identifierBytes = ArrayUtils.subarray(byteRepresentation, 0, DefaultSessionLayerMessageIdentifier.BYTE_REPRESENTATION_LENGTH);
+		DefaultSessionLayerMessageIdentifier identifier = DefaultSessionLayerMessageIdentifier.from(identifierBytes);
+		byte[] payload = ArrayUtils.subarray(byteRepresentation, DefaultSessionLayerMessageIdentifier.BYTE_REPRESENTATION_LENGTH, byteRepresentation.length);
+		
+		return new DefaultSessionLayerMessage(identifier, payload);
+	}
+	
+	
+	public SessionMessage toSessionMessage() {
+		byte[] identifierBytes = identifier.getByteVal();
+		byte[] sessionMessagePayload = ArrayUtils.addAll(identifierBytes, payload);
+		return new SessionMessage(sessionMessagePayload);
 	}
 
 }

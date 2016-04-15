@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
-import ch.bifrost.core.api.datagram.Packet;
-import ch.bifrost.core.api.session.SessionPacket;
-import ch.bifrost.core.api.session.SessionPacketSender;
+import ch.bifrost.core.api.datagram.DatagramMessage;
+import ch.bifrost.core.api.session.SessionInternalMessage;
+import ch.bifrost.core.api.session.SessionInternalMessageSender;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
-import ch.bifrost.core.impl.session.SessionPacketSenderImpl;
+import ch.bifrost.core.impl.session.SessionInternalMessageSenderImpl;
 
 /**
  * Multiplexes a single {@link DatagramEndpoint} into several {@link NetworkEndointForSessionConverter}. Makes sure each message is sent to the correct process.
@@ -31,11 +31,11 @@ public class SessionMultiplexConverter implements Closeable {
 	
 	private final MultiplexingReceiver receiver;
 	private final SessionStore sessionStore = new SessionStore();
-	private final SessionPacketSender sessionPacketSender;
+	private final SessionInternalMessageSender sessionPacketSender;
 	
 
 	public SessionMultiplexConverter(DatagramEndpoint datagramEndpoint) throws SocketException {
-		sessionPacketSender = new SessionPacketSenderImpl(datagramEndpoint);
+		sessionPacketSender = new SessionInternalMessageSenderImpl(datagramEndpoint);
 		receiver = new MultiplexingReceiver(datagramEndpoint);
 		receiver.start();
 	}
@@ -46,7 +46,7 @@ public class SessionMultiplexConverter implements Closeable {
 	}
 	
 	public NetworkEndointForSessionConverter registerSessionID(String id) {
-		BlockingQueue<SessionPacket> queue = new LinkedBlockingQueue<>();
+		BlockingQueue<SessionInternalMessage> queue = new LinkedBlockingQueue<>();
 		NetworkEndointForSessionConverter singleSessionEndpoint = new ServerNetworkEndpointForSessionConverter(sessionPacketSender, queue, id);
 		// should probably throw an exception if a session with that ID already exists
 		sessionStore.put(id, queue);
@@ -71,7 +71,7 @@ public class SessionMultiplexConverter implements Closeable {
 		@Override
 		public void run() {
 			while(!cancelled) {
-				Optional<Packet> receivedPacket = Optional.absent();
+				Optional<DatagramMessage> receivedPacket = Optional.absent();
 				try {
 					receivedPacket = datagramEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
 				} catch (IOException e) {
@@ -81,7 +81,7 @@ public class SessionMultiplexConverter implements Closeable {
 					continue;
 				}
 				LOG.debug("Received a message: " + receivedPacket.get());
-				SessionPacket sessionPacket = SessionPacket.fromPacket(receivedPacket.get());
+				SessionInternalMessage sessionPacket = SessionInternalMessage.from(receivedPacket.get());
 				String id = sessionPacket.getSessionId();
 				if (id == null || !sessionStore.contains(id)) {
 					LOG.warn("Received unknown session ID: " + id);
