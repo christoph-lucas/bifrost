@@ -37,7 +37,7 @@ public abstract class NetworkEndointForSessionConverter {
 	/**
 	 * Send the message to the communication partner in this session.
 	 * @param message the message to be sent
-	 * @throws IOException thrown if an error occurrs
+	 * @throws IOException thrown if an error occurs
 	 */
 	public void send(Message message) throws IOException {
 		if (counterpartAddress == null || counterpartPort == 0) {

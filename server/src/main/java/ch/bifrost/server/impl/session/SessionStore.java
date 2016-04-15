@@ -33,7 +33,7 @@ public class SessionStore {
 	}
 	
 	public void killAll() {
-		store.forEach((id, state) -> state.getServerProcess().cancel());
+		store.forEach((id, state) -> state.kill());
 	}
 	
 }

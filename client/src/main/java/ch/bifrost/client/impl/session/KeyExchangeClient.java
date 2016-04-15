@@ -8,9 +8,8 @@ import com.google.common.base.Optional;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.Packet;
 import ch.bifrost.core.api.session.IdKeyPair;
-import ch.bifrost.core.api.session.KeyExchange;
 
-public class KeyExchangeClient implements KeyExchange {
+public class KeyExchangeClient {
 
 	private DatagramEndpoint datagramEndpoint;
 	private InetAddress serverHost;
@@ -22,7 +21,6 @@ public class KeyExchangeClient implements KeyExchange {
 		this.serverPort = serverPort;
 	}
 	
-	@Override
 	public Optional<IdKeyPair> get(long timeout, TimeUnit unit) throws Exception {
 		Packet request = new Packet(serverHost, serverPort, "Key Exchange Request");
 		datagramEndpoint.send(request);

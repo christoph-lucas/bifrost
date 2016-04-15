@@ -29,9 +29,10 @@ public class SessionMultiplexConverter implements Closeable {
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 	
-	private MultiplexingReceiver receiver;
-	private SessionStore sessionStore = new SessionStore();
-	SessionPacketSender sessionPacketSender;
+	private final MultiplexingReceiver receiver;
+	private final SessionStore sessionStore = new SessionStore();
+	private final SessionPacketSender sessionPacketSender;
+	
 
 	public SessionMultiplexConverter(DatagramEndpoint datagramEndpoint) throws SocketException {
 		sessionPacketSender = new SessionPacketSenderImpl(datagramEndpoint);

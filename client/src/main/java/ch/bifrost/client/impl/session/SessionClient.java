@@ -10,7 +10,6 @@ import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.session.IdKeyPair;
-import ch.bifrost.core.api.session.KeyExchange;
 import ch.bifrost.core.api.session.Message;
 import ch.bifrost.core.api.session.SessionConverter;
 import ch.bifrost.core.api.session.SessionConverterFactory;
@@ -23,7 +22,7 @@ import ch.bifrost.core.impl.session.SessionPacketSenderImpl;
  */
 public class SessionClient implements Closeable {
 
-	private final KeyExchange keyExchange;
+	private final KeyExchangeClient keyExchange;
 	private final SessionConverterFactory sessionConverterFactory;
 	private final InetAddress serverHost;
 	private final int serverPort;

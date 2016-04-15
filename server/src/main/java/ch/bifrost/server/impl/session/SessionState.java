@@ -21,6 +21,8 @@ public class SessionState {
 
 	public void kill() {
 		alive = false;
-		serverProcess.cancel();
+		if (serverProcess != null) {
+			serverProcess.cancel();
+		}
 	}
 }
