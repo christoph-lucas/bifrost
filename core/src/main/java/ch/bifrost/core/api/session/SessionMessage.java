@@ -8,8 +8,8 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class Message {
+public class SessionMessage {
 
-	private final String content;
+	private final byte[] payload;
 	
 }

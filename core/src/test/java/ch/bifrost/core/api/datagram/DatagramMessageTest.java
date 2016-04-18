@@ -8,13 +8,15 @@ import java.net.InetAddress;
 
 import org.junit.Test;
 
-public class PacketTest {
+import ch.bifrost.core.impl.MessageCodecUtils;
 
-	private static final String CONTENT = "content";
+public class DatagramMessageTest {
+
+	private static final byte[] CONTENT = MessageCodecUtils.encodeStringAsByteArray("content");
 
 	@Test
 	public void shouldDecodeWhatWasEncoded() throws Exception {
-		String decoded = new Packet((InetAddress) null, 0, CONTENT).getContent();
+		byte[] decoded = new DatagramMessage((InetAddress) null, 0, CONTENT).getPayload();
 		assertThat(decoded, is(equalTo(CONTENT)));
 	}
 }

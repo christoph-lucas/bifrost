@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 
-import ch.bifrost.core.api.session.SessionPacket;
-import ch.bifrost.core.api.session.SessionPacketSender;
+import ch.bifrost.core.api.session.SessionInternalMessage;
+import ch.bifrost.core.api.session.SessionInternalMessageSender;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 
 /**
@@ -14,17 +14,17 @@ import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
  */
 public class ServerNetworkEndpointForSessionConverter extends NetworkEndointForSessionConverter {
 
-	private final BlockingQueue<SessionPacket> receivedMessages;
+	private final BlockingQueue<SessionInternalMessage> receivedMessages;
 	
-	public ServerNetworkEndpointForSessionConverter(SessionPacketSender sessionPacketSender, BlockingQueue<SessionPacket> receivedMessages, String sessionId) {
+	public ServerNetworkEndpointForSessionConverter(SessionInternalMessageSender sessionPacketSender, BlockingQueue<SessionInternalMessage> receivedMessages, String sessionId) {
 		super(sessionPacketSender, sessionId);
 		this.receivedMessages = receivedMessages;
 	}
 
 
 	@Override
-	protected SessionPacket internalReceive() throws InterruptedException {
-		SessionPacket sessionPacket = receivedMessages.take();
+	protected SessionInternalMessage internalReceive() throws InterruptedException {
+		SessionInternalMessage sessionPacket = receivedMessages.take();
 		super.counterpartAddress(sessionPacket.getCounterpartAddress());
 		super.counterpartPort(sessionPacket.getCounterpartPort());
 		return sessionPacket;
@@ -32,8 +32,8 @@ public class ServerNetworkEndpointForSessionConverter extends NetworkEndointForS
 
 
 	@Override
-	protected Optional<SessionPacket> internalReceive(long timeout, TimeUnit unit) throws InterruptedException {
-		SessionPacket packet = receivedMessages.poll(timeout, unit);
+	protected Optional<SessionInternalMessage> internalReceive(long timeout, TimeUnit unit) throws InterruptedException {
+		SessionInternalMessage packet = receivedMessages.poll(timeout, unit);
 		if (packet == null) {
 			return Optional.absent();
 		}

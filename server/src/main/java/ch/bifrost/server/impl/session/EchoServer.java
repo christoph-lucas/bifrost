@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
-import ch.bifrost.core.api.session.Message;
 import ch.bifrost.core.api.session.SessionConverter;
+import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.server.api.server.ServerProcess;
 import ch.bifrost.server.api.server.ServerProcessFactory;
 
@@ -34,12 +34,12 @@ public class EchoServer implements ServerProcess {
 		LOG.debug("Hello from the EchoServer. I'm up and running!");
 		while(!cancelled) {
 			try {
-				Optional<Message> message = sessionEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
+				Optional<SessionMessage> message = sessionEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
 				if (!message.isPresent()) {
 					continue;
 				}
 				LOG.debug("Server received message, sending echo.");
-				sessionEndpoint.send(new Message("Echo: " + message.get().getContent()));
+				sessionEndpoint.send(new SessionMessage(message.get().getPayload()));
 			} catch (Exception e) {
 				LOG.debug("Error receiving a message: " + e.getMessage());
 			}

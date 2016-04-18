@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import ch.bifrost.core.api.session.IdKeyPair;
-import ch.bifrost.core.api.session.Message;
+import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.api.session.SessionConverterFactory;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
@@ -23,7 +23,7 @@ public class DefaultServerSessionConverter extends DefaultSessionLayerAdapter {
 		super(endpoint);
 	}
 
-	protected Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers(DefaultSessionLayerMessageSender sender, BlockingQueue<Message> queueTowardsUpperLayer) {
+	protected Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers(DefaultSessionLayerMessageSender sender, BlockingQueue<SessionMessage> queueTowardsUpperLayer) {
 		Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers = new HashMap<>();
 		handlers.put(DefaultSessionLayerMessageIdentifier.DATA_PAYLOAD, new DataPayloadHandler(queueTowardsUpperLayer));
 		handlers.put(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY, new RekeyHandler(sender));

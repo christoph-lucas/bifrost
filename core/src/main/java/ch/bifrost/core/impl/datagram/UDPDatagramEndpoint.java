@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
-import ch.bifrost.core.api.datagram.Packet;
+import ch.bifrost.core.api.datagram.DatagramMessage;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -48,23 +48,23 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 	}
 	
 	@Override
-	public void send(Packet outgoing) throws IOException {
-		socket.send(outgoing.toDatagram());
+	public void send(DatagramMessage outgoing) throws IOException {
+		socket.send(outgoing.toUdpPacket());
 	}
 	
 	@Override
-	public Packet receive() throws IOException {
+	public DatagramMessage receive() throws IOException {
 		byte[] incomingBuffer = new byte[receiverBufferSizeInBytes];
 		DatagramPacket datagram = new DatagramPacket(incomingBuffer, incomingBuffer.length);
 		synchronized(socket) {
 			socket.setSoTimeout(0);
 			socket.receive(datagram);
 		}
-		return Packet.fromDatagram(datagram);
+		return DatagramMessage.from(datagram);
 	}
 	
 	@Override
-	public Optional<Packet> receive(long timeout, TimeUnit unit) throws IOException {
+	public Optional<DatagramMessage> receive(long timeout, TimeUnit unit) throws IOException {
 		long socketTimeoutInMs = unit.toMillis(timeout);
 		byte[] incomingBuffer = new byte[receiverBufferSizeInBytes];
 		DatagramPacket datagram = new DatagramPacket(incomingBuffer, incomingBuffer.length);
@@ -76,7 +76,7 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 				return Optional.absent();
 			}
 		}
-		return Optional.of(Packet.fromDatagram(datagram));
+		return Optional.of(DatagramMessage.from(datagram));
 	}
 
 }
