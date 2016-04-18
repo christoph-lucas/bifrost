@@ -1,5 +1,10 @@
 package ch.bifrost.integrationtest.session;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -8,8 +13,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
@@ -18,12 +21,13 @@ import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.session.IdKeyPair;
 import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
 import ch.bifrost.server.impl.session.KeyExchangeServer;
+import lombok.Getter;
 
 public class KeyExchangeTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KeyExchangeTest.class);
 	private static InetAddress SERVER_HOST;
 	private static final int SERVER_PORT = 4567;
+	private static final String ID = "123";
 
 	@BeforeClass
 	public static void setupLogger() throws Exception {
@@ -43,22 +47,25 @@ public class KeyExchangeTest {
 		
 		DatagramEndpoint clientEndpoint = new UDPDatagramEndpoint();
 		KeyExchangeClient client = new KeyExchangeClient(clientEndpoint, SERVER_HOST, SERVER_PORT);
-		new ServerThread(server).start();
+		ServerThread serverThread = new ServerThread(server);
 		
-		Optional<IdKeyPair> optionalKey = client.get(1000, TimeUnit.SECONDS);
-		if (optionalKey.isPresent()) {
-			LOG.info("Client: " + optionalKey.get().toString());
-		} else {
-			LOG.info("Got no IdKeyPair");
-		}
+		serverThread.start();
+		Optional<IdKeyPair> clientKey = client.get(1000, TimeUnit.SECONDS);
+		serverThread.join();
 		
+		assertTrue(clientKey.isPresent());
+		assertThat(clientKey.get().getId(), is(equalTo(ID)));
+		assertTrue(serverThread.getServerKey().isPresent());
+		assertThat(serverThread.getServerKey().get().getId(), is(equalTo(ID)));
+		assertThat(serverThread.getServerKey().get().getKey(), is(equalTo(clientKey.get().getKey())));
 	}
 	
 	
 	private static class ServerThread extends Thread {
 		
-	    private static final Logger LOG = LoggerFactory.getLogger(ServerThread.class);
 		private KeyExchangeServer server;
+		@Getter
+		private Optional<IdKeyPair> serverKey;
 
 		public ServerThread(KeyExchangeServer server) {
 			this.server = server;
@@ -67,14 +74,9 @@ public class KeyExchangeTest {
 		@Override
 		public void run() {
 			try {
-				Optional<IdKeyPair> optionalKey = server.get(1000, TimeUnit.SECONDS);
-				if (optionalKey.isPresent()) {
-					LOG.info("Server: " + optionalKey.get().toString());
-				} else {
-					LOG.info("Server got no IdKeyPair");
-				}
+				serverKey = server.get(ID, 1000, TimeUnit.SECONDS);
 			} catch (Exception e) {
-				LOG.error("something went wrong", e);
+				// ignore
 			}
 		}
 	}
