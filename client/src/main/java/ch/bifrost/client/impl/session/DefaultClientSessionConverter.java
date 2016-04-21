@@ -14,7 +14,7 @@ import ch.bifrost.core.api.session.SessionConverterFactory;
 import ch.bifrost.core.impl.MessageCodecUtils;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
-import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerAdapter;
+import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerConverter;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessage;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessageHandler;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessageIdentifier;
@@ -23,7 +23,7 @@ import ch.bifrost.core.impl.session.defaultImpl.RekeyReplyHandler;
 /**
  * The client side adapter for the default session layer.
  */
-public class DefaultClientSessionConverter extends DefaultSessionLayerAdapter {
+public class DefaultClientSessionConverter extends DefaultSessionLayerConverter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultClientSessionConverter.class);
 

@@ -31,7 +31,7 @@ public class KeyExchangeServer  {
 				
 		IdKeyPair idKeyPair = new IdKeyPair(id, key);
 		
-		DatagramMessage response = new DatagramMessage(request.getCounterpartAddress(), request.getCounterpartPort(), idKeyPair.encode());
+		DatagramMessage response = new DatagramMessage(request.getCounterpartAddress(), idKeyPair.encode());
 		datagramEndpoint.send(response);
 		
 		return Optional.of(idKeyPair);

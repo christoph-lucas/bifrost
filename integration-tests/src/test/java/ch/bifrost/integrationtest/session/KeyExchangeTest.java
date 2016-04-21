@@ -17,6 +17,7 @@ import org.junit.Test;
 import com.google.common.base.Optional;
 
 import ch.bifrost.client.impl.session.KeyExchangeClient;
+import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.session.IdKeyPair;
 import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
@@ -47,7 +48,8 @@ public class KeyExchangeTest {
 		KeyExchangeServer server = new KeyExchangeServer(serverEndpoint);
 		
 		DatagramEndpoint clientEndpoint = new UDPDatagramEndpoint();
-		KeyExchangeClient client = new KeyExchangeClient(clientEndpoint, SERVER_HOST, SERVER_PORT);
+		CounterpartAddress serverAddress = new CounterpartAddress(SERVER_HOST, SERVER_PORT);
+		KeyExchangeClient client = new KeyExchangeClient(clientEndpoint, serverAddress);
 		ServerThread serverThread = new ServerThread(server);
 		
 		serverThread.start();
