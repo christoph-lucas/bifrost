@@ -2,7 +2,7 @@ package ch.bifrost.integrationtest.session;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +31,11 @@ public class DefaultSessionTest extends AbstractSessionTest {
 		return new DefaultClientSessionConverterFactory();
 	}
 
+	@Test
+	public void testName() throws Exception {
+		throw new IllegalStateException();
+	}
+	
 	@Test
 	public void shouldPlayPingPongOnce() throws Exception {
 		client().initializeSession(1000, TimeUnit.SECONDS);
