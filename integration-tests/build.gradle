@@ -1,6 +1,6 @@
 sourceSets {
     integrationTest {
-        javasrcDir file('src/integration-test/java')
+        java.srcDir file('src/integration-test/java')
         resources.srcDir file('src/integration-test/resources')
     }
 }

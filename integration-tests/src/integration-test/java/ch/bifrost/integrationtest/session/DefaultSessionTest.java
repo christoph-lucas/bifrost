@@ -32,11 +32,6 @@ public class DefaultSessionTest extends AbstractSessionTest {
 	}
 
 	@Test
-	public void testName() throws Exception {
-		throw new IllegalStateException();
-	}
-	
-	@Test
 	public void shouldPlayPingPongOnce() throws Exception {
 		client().initializeSession(1000, TimeUnit.SECONDS);
 		LOG.info("Client session initialized");
