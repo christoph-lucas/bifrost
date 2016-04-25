@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 
+import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.session.IdKeyPair;
 import ch.bifrost.core.api.session.SessionMessage;
@@ -24,8 +25,7 @@ public class SessionClient implements Closeable {
 
 	private final KeyExchangeClient keyExchange;
 	private final SessionConverterFactory sessionConverterFactory;
-	private final InetAddress serverHost;
-	private final int serverPort;
+	private final CounterpartAddress serverPayloadAddress;
 
 	private final DatagramEndpoint clientPayloadDatagramEndpoint;
 	private final UDPDatagramEndpoint clientKeyExchangeDatagramEndpoint;
@@ -34,12 +34,12 @@ public class SessionClient implements Closeable {
 	private SessionConverter sessionConverter;
 
 	public SessionClient(InetAddress serverHost, int serverKeyExchangePort, int serverPayloadPort, SessionConverterFactory sessionConverterFactory) throws SocketException {
-		this.serverHost = serverHost;
-		serverPort = serverPayloadPort;
+		serverPayloadAddress = new CounterpartAddress(serverHost, serverPayloadPort);
 		this.sessionConverterFactory = sessionConverterFactory;
 		
 		clientKeyExchangeDatagramEndpoint = new UDPDatagramEndpoint();
-		keyExchange = new KeyExchangeClient(clientKeyExchangeDatagramEndpoint, serverHost, serverKeyExchangePort);
+		CounterpartAddress serverKeyExchangeAddress = new CounterpartAddress(serverHost, serverKeyExchangePort);
+		keyExchange = new KeyExchangeClient(clientKeyExchangeDatagramEndpoint, serverKeyExchangeAddress);
 		
 		clientPayloadDatagramEndpoint = new UDPDatagramEndpoint();
 	}
@@ -55,7 +55,7 @@ public class SessionClient implements Closeable {
 		}
 		IdKeyPair idKeyPair = optional.get();
 		SessionInternalMessageSenderImpl payloadSender = new SessionInternalMessageSenderImpl(clientPayloadDatagramEndpoint);
-		NetworkEndointForSessionConverter networkAccessPoint = new ClientNetworkEndpointForSessionConverter(payloadSender, serverHost, serverPort, clientPayloadDatagramEndpoint, idKeyPair.getId());
+		NetworkEndointForSessionConverter networkAccessPoint = new ClientNetworkEndpointForSessionConverter(payloadSender, serverPayloadAddress, clientPayloadDatagramEndpoint, idKeyPair.getId());
 		sessionConverter = sessionConverterFactory.newSessionConverter(networkAccessPoint, idKeyPair);
 		sessionInitialized = true;
 		return sessionConverter;

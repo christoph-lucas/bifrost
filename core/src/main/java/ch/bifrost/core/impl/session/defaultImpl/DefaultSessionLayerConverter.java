@@ -19,9 +19,9 @@ import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 /**
  * The default implementation of the session layer as proposed in the paper. Serves as a base class for both client and server.
  */
-public abstract class DefaultSessionLayerAdapter implements SessionConverter, Closeable {
+public abstract class DefaultSessionLayerConverter implements SessionConverter, Closeable {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerConverter.class);
 
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
@@ -30,7 +30,7 @@ public abstract class DefaultSessionLayerAdapter implements SessionConverter, Cl
 	private final DefaultSessionLayerReceiver receiver;
 	private DefaultSessionLayerMessageSender sender; 
 
-	public DefaultSessionLayerAdapter(NetworkEndointForSessionConverter networkAccessPoint) {
+	public DefaultSessionLayerConverter(NetworkEndointForSessionConverter networkAccessPoint) {
 		sender = new DefaultSessionLayerMessageSender(networkAccessPoint);
 		receiver = new DefaultSessionLayerReceiver(networkAccessPoint, getMessageHandlers(sender, queueTowardsUpperLayer));
 		receiver.start();

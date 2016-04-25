@@ -1,11 +1,11 @@
 package ch.bifrost.client.impl.session;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 
+import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.api.session.SessionInternalMessage;
@@ -16,10 +16,9 @@ public class ClientNetworkEndpointForSessionConverter extends NetworkEndointForS
 
 	private DatagramEndpoint datagramEndpoint;
 
-	public ClientNetworkEndpointForSessionConverter(SessionInternalMessageSender sessionPacketSender, InetAddress serverAddress, int serverPort, DatagramEndpoint datagramEndpoint, String sessionId) {
+	public ClientNetworkEndpointForSessionConverter(SessionInternalMessageSender sessionPacketSender, CounterpartAddress serverAddress, DatagramEndpoint datagramEndpoint, String sessionId) {
 		super(sessionPacketSender, sessionId);
 		super.counterpartAddress(serverAddress);
-		super.counterpartPort(serverPort);
 		this.datagramEndpoint = datagramEndpoint;
 	}
 
