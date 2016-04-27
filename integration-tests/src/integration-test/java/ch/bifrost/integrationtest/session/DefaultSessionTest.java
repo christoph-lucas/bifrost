@@ -2,7 +2,7 @@ package ch.bifrost.integrationtest.session;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.TimeUnit;
 
