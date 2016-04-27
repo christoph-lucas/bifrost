@@ -1,14 +1,14 @@
 package ch.bifrost.core.impl.session;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 
-import ch.bifrost.core.api.session.SessionMessage;
+import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.session.SessionInternalMessage;
 import ch.bifrost.core.api.session.SessionInternalMessageSender;
+import ch.bifrost.core.api.session.SessionMessage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -20,10 +20,7 @@ public abstract class NetworkEndointForSessionConverter {
 	private final String sessionId;
 	@Getter
 	@Setter
-	private InetAddress counterpartAddress;
-	@Getter
-	@Setter
-	private int counterpartPort;
+	private CounterpartAddress counterpartAddress;
 
 	public NetworkEndointForSessionConverter(SessionInternalMessageSender sessionPacketSender, String sessionId) {
 		this.sessionPacketSender = sessionPacketSender;
@@ -40,10 +37,10 @@ public abstract class NetworkEndointForSessionConverter {
 	 * @throws IOException thrown if an error occurs
 	 */
 	public void send(SessionMessage message) throws IOException {
-		if (counterpartAddress == null || counterpartPort == 0) {
+		if (!counterpartAddress.isValid()) {
 			throw new IllegalStateException("CounterpartAddress or port not set, cannot send message.");
 		}
-		SessionInternalMessage sessionPacket = new SessionInternalMessage(counterpartAddress, counterpartPort, sessionId, message.getPayload());
+		SessionInternalMessage sessionPacket = new SessionInternalMessage(counterpartAddress, sessionId, message.getPayload());
 		sessionPacketSender.send(sessionPacket);
 	}
 
@@ -55,7 +52,7 @@ public abstract class NetworkEndointForSessionConverter {
 		while (true) { // run until we have a valid message
 			SessionInternalMessage sessionPacket = internalReceive();
 			if (sessionId.equals(sessionPacket.getSessionId())) {
-				return new SessionMessage(sessionPacket.getPayload());
+				return SessionMessage.from(sessionPacket);
 			}
 		}
 	}
@@ -71,7 +68,7 @@ public abstract class NetworkEndointForSessionConverter {
 			return Optional.absent();
 		}
 		if (sessionId.equals(sessionPacket.get().getSessionId())) {
-			return Optional.of(new SessionMessage(sessionPacket.get().getPayload()));
+			return Optional.of(SessionMessage.from(sessionPacket.get()));
 		}
 		// received a message with wrong counterpart, return even if the timeout is not yet over
 		return Optional.absent();
