@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.impl.MessageCodecUtils;
 
@@ -34,7 +35,8 @@ public class UDPDatagramEndpointTest {
 	
 	@Test
 	public void shouldReceiveWhatWasSent() throws Exception {
-		DatagramMessage outgoing = new DatagramMessage(SERVER_HOST, SERVER_PORT, CLIENT_MESSAGE);
+		CounterpartAddress serverAddress = new CounterpartAddress(SERVER_HOST, SERVER_PORT);
+		DatagramMessage outgoing = new DatagramMessage(serverAddress, CLIENT_MESSAGE);
 
 		clientEndpoint.send(outgoing);
 		DatagramMessage incoming = serverEndpoint.receive();
@@ -44,11 +46,12 @@ public class UDPDatagramEndpointTest {
 	
 	@Test
 	public void shouldBeAbleToReply() throws Exception {
-		DatagramMessage message = new DatagramMessage(SERVER_HOST, SERVER_PORT, CLIENT_MESSAGE);
+		CounterpartAddress serverAddress = new CounterpartAddress(SERVER_HOST, SERVER_PORT);
+		DatagramMessage message = new DatagramMessage(serverAddress, CLIENT_MESSAGE);
 		clientEndpoint.send(message);
 
 		DatagramMessage incoming = serverEndpoint.receive();
-		DatagramMessage reply = new DatagramMessage(incoming.getCounterpartAddress(), incoming.getCounterpartPort(), SERVER_MESSAGE);
+		DatagramMessage reply = new DatagramMessage(incoming.getCounterpartAddress(), SERVER_MESSAGE);
 		serverEndpoint.send(reply);
 		
 		DatagramMessage incomingReply = clientEndpoint.receive();

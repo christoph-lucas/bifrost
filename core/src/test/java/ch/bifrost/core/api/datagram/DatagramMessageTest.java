@@ -16,7 +16,7 @@ public class DatagramMessageTest {
 
 	@Test
 	public void shouldDecodeWhatWasEncoded() throws Exception {
-		byte[] decoded = new DatagramMessage((InetAddress) null, 0, CONTENT).getPayload();
+		byte[] decoded = new DatagramMessage(new CounterpartAddress((InetAddress) null, 0), CONTENT).getPayload();
 		assertThat(decoded, is(equalTo(CONTENT)));
 	}
 }

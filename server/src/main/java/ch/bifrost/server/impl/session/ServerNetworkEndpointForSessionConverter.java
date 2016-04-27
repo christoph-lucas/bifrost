@@ -25,8 +25,6 @@ public class ServerNetworkEndpointForSessionConverter extends NetworkEndointForS
 	@Override
 	protected SessionInternalMessage internalReceive() throws InterruptedException {
 		SessionInternalMessage sessionPacket = receivedMessages.take();
-		super.counterpartAddress(sessionPacket.getCounterpartAddress());
-		super.counterpartPort(sessionPacket.getCounterpartPort());
 		return sessionPacket;
 	}
 
@@ -37,8 +35,6 @@ public class ServerNetworkEndpointForSessionConverter extends NetworkEndointForS
 		if (packet == null) {
 			return Optional.absent();
 		}
-		super.counterpartAddress(packet.getCounterpartAddress());
-		super.counterpartPort(packet.getCounterpartPort());
 		return Optional.of(packet);
 	}
 }

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
+import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 
@@ -46,7 +47,9 @@ public class DefaultSessionLayerReceiver extends Thread {
 				continue;
 			}
 			try {
-				LOG.debug("Received a message. Converting to DefaultSessionLayerMessage.");
+				LOG.debug("Received a message. Updating Counterpart Address on network endpoint.");
+				endpoint.counterpartAddress((CounterpartAddress) receivedMessage.get().getContextData().get(SessionMessage.COUNTERPART_ADDRESS)); 
+				LOG.debug("Converting to DefaultSessionLayerMessage.");
 				DefaultSessionLayerMessage sessionLayerMessage = DefaultSessionLayerMessage.from(receivedMessage.get()); 
 				LOG.debug("Looking for handler.");
 				DefaultSessionLayerMessageHandler handler = handlers.get(sessionLayerMessage.getIdentifier());

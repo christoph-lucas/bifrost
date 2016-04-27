@@ -1,9 +1,8 @@
 package ch.bifrost.core.api.session;
 
-import java.net.InetAddress;
-
 import org.apache.commons.lang3.ArrayUtils;
 
+import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.impl.MessageCodecUtils;
 import lombok.AllArgsConstructor;
@@ -23,8 +22,7 @@ import lombok.ToString;
 public class SessionInternalMessage {
 
 	
-	private InetAddress counterpartAddress;
-	private int counterpartPort;
+	private CounterpartAddress counterpartAddress;
 	private String sessionId;
 	private byte[] payload;
 
@@ -35,14 +33,14 @@ public class SessionInternalMessage {
 		String sessionId = MessageCodecUtils.decodeStringFromByteArray(sessionIdBytes);
 		byte[] payload = ArrayUtils.subarray(byteRepresentation, SessionConverter.SESSION_ID_LENGTH_IN_BYTES, byteRepresentation.length);
 		
-		return new SessionInternalMessage(packet.getCounterpartAddress(), packet.getCounterpartPort(), sessionId, payload);
+		return new SessionInternalMessage(packet.getCounterpartAddress(), sessionId, payload);
 	}
 
 	
 	public DatagramMessage toDatagramMessage() {
 		byte[] sessionIdBytesCorrectLength = MessageCodecUtils.encodeStringAsByteArrayWithFixedLength(sessionId, SessionConverter.SESSION_ID_LENGTH_IN_BYTES);
 		byte[] datagramMessagePayload = ArrayUtils.addAll(sessionIdBytesCorrectLength, payload);
-		return new DatagramMessage(counterpartAddress, counterpartPort, datagramMessagePayload);
+		return new DatagramMessage(counterpartAddress, datagramMessagePayload);
 	}
 
 	

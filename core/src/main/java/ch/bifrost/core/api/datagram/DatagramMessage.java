@@ -1,8 +1,6 @@
 package ch.bifrost.core.api.datagram;
 
 import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.bouncycastle.util.Arrays;
 
@@ -19,25 +17,18 @@ import lombok.ToString;
 @ToString
 public class DatagramMessage {
 	@Getter
-	private InetAddress counterpartAddress;
-	@Getter
-	private int counterpartPort;
+	private CounterpartAddress counterpartAddress;
 	@Getter
 	private byte[] payload;
 	
-	public DatagramMessage(String host, int counterpartPort, byte[] payload) throws UnknownHostException {
-		this.counterpartAddress = InetAddress.getByName(host);
-		this.counterpartPort = counterpartPort;
-		this.payload = payload;
-	}
-	
 	public static DatagramMessage from(DatagramPacket datagram) {
 		byte[] udpPacketPayload = Arrays.copyOfRange(datagram.getData(), 0, datagram.getLength());
-		return new DatagramMessage(datagram.getAddress(), datagram.getPort(), udpPacketPayload);
+		CounterpartAddress counterpartAddress = new CounterpartAddress(datagram.getAddress(), datagram.getPort());
+		return new DatagramMessage(counterpartAddress, udpPacketPayload);
 	}
 	
 	public DatagramPacket toUdpPacket() {
-		return new DatagramPacket(payload, payload.length, counterpartAddress, counterpartPort);
+		return new DatagramPacket(payload, payload.length, counterpartAddress.getIp(), counterpartAddress.getPort());
 	}
 	
 }
