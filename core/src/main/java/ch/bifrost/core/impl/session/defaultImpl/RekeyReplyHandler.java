@@ -13,7 +13,7 @@ public class RekeyReplyHandler implements DefaultSessionLayerMessageHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(RekeyReplyHandler.class);
 
 	@Override
-	public void handle(DefaultSessionLayerMessage message) {
+	public void handle (DefaultSessionLayerMessage message) {
 		LOG.debug("Received rekey reply with content: " + MessageCodecUtils.decodeStringFromByteArray(message.getPayload()));
 	}
 

@@ -7,6 +7,6 @@ import java.io.IOException;
  */
 public interface DefaultSessionLayerMessageHandler {
 
-	void handle(DefaultSessionLayerMessage receivedMessage) throws IOException;
-	
+	void handle (DefaultSessionLayerMessage receivedMessage) throws IOException;
+
 }

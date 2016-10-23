@@ -12,33 +12,33 @@ import ch.bifrost.core.impl.session.NoCryptoSessionConverter.NoCryptoSessionConv
 
 public class NoCryptoSessionTest extends AbstractSessionTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NoCryptoSessionTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(NoCryptoSessionTest.class);
 
-    public static final byte[] PING = MessageCodecUtils.encodeStringAsByteArray("ping");
-    public static final byte[] PONG = MessageCodecUtils.encodeStringAsByteArray("pong");
+	public static final byte[] PING = MessageCodecUtils.encodeStringAsByteArray("ping");
+	public static final byte[] PONG = MessageCodecUtils.encodeStringAsByteArray("pong");
 
-    protected NoCryptoSessionConverterFactory getServerSessionConverterFactory() {
+	protected NoCryptoSessionConverterFactory getServerSessionConverterFactory () {
 		return new NoCryptoSessionConverterFactory();
 	}
 
-	protected NoCryptoSessionConverterFactory getClientSessionConverterFactory() {
+	protected NoCryptoSessionConverterFactory getClientSessionConverterFactory () {
 		return new NoCryptoSessionConverterFactory();
 	}
 
 	@Test
-	public void shouldPlayPingPongOnce() throws Exception {
+	public void shouldPlayPingPongOnce () throws Exception {
 		client().initializeSession(1000, TimeUnit.SECONDS);
 		client().send(new SessionMessage(PING));
 		LOG.info(client().receive().toString());
 	}
-	
+
 	@Test
-	public void shouldPlayPingPongTwice() throws Exception {
+	public void shouldPlayPingPongTwice () throws Exception {
 		client().initializeSession(1000, TimeUnit.SECONDS);
 		client().send(new SessionMessage(PING));
 		LOG.info(client().receive().toString());
 		client().send(new SessionMessage(PONG));
 		LOG.info(client().receive().toString());
 	}
-	
+
 }

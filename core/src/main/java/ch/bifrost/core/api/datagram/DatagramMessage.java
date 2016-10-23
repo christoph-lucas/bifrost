@@ -16,19 +16,20 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class DatagramMessage {
+
 	@Getter
 	private CounterpartAddress counterpartAddress;
 	@Getter
 	private byte[] payload;
-	
-	public static DatagramMessage from(DatagramPacket datagram) {
+
+	public static DatagramMessage from (DatagramPacket datagram) {
 		byte[] udpPacketPayload = Arrays.copyOfRange(datagram.getData(), 0, datagram.getLength());
 		CounterpartAddress counterpartAddress = new CounterpartAddress(datagram.getAddress(), datagram.getPort());
 		return new DatagramMessage(counterpartAddress, udpPacketPayload);
 	}
-	
-	public DatagramPacket toUdpPacket() {
+
+	public DatagramPacket toUdpPacket () {
 		return new DatagramPacket(payload, payload.length, counterpartAddress.getIp(), counterpartAddress.getPort());
 	}
-	
+
 }

@@ -13,13 +13,13 @@ public class CounterpartAddress {
 	private final InetAddress ip;
 	private final int port;
 
-	public CounterpartAddress(String host, int port) throws UnknownHostException {
+	public CounterpartAddress (String host, int port) throws UnknownHostException {
 		ip = InetAddress.getByName(host);
 		this.port = port;
 	}
-	
-	public boolean isValid() {
+
+	public boolean isValid () {
 		return ip != null && port != 0;
 	}
-	
+
 }

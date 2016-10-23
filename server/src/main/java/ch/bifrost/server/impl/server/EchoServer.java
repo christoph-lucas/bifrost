@@ -17,22 +17,22 @@ import ch.bifrost.server.api.server.ServerProcessFactory;
  */
 public class EchoServer implements ServerProcess {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EchoServer.class);
-	
+	private static final Logger LOG = LoggerFactory.getLogger(EchoServer.class);
+
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
-	
+
 	private SessionConverter sessionEndpoint;
 	private boolean cancelled;
 
-	public EchoServer(SessionConverter sessionEndpoint) {
+	public EchoServer (SessionConverter sessionEndpoint) {
 		this.sessionEndpoint = sessionEndpoint;
 	}
-	
+
 	@Override
-	public void run() {
+	public void run () {
 		LOG.debug("Hello from the EchoServer. I'm up and running!");
-		while(!cancelled) {
+		while (!cancelled) {
 			try {
 				Optional<SessionMessage> message = sessionEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
 				if (!message.isPresent()) {
@@ -47,17 +47,16 @@ public class EchoServer implements ServerProcess {
 	}
 
 	@Override
-	public void cancel() {
+	public void cancel () {
 		cancelled = true;
 	}
 
 	public static class EchoServerFactory implements ServerProcessFactory {
+
 		@Override
-		public ServerProcess newServerProcess(SessionConverter sessionEndpoint) {
+		public ServerProcess newServerProcess (SessionConverter sessionEndpoint) {
 			return new EchoServer(sessionEndpoint);
 		}
 	}
-
-
 
 }

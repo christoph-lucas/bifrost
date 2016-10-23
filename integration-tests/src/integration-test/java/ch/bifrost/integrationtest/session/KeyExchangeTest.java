@@ -32,7 +32,7 @@ public class KeyExchangeTest {
 	private static final String ID = "01234567890123456789012345678912";
 
 	@BeforeClass
-	public static void setupLogger() throws Exception {
+	public static void setupLogger () throws Exception {
 		ConsoleAppender console = new ConsoleAppender();
 		String pattern = "%d [%-5p|%c] %m%n";
 		console.setLayout(new PatternLayout(pattern));
@@ -41,41 +41,40 @@ public class KeyExchangeTest {
 		org.apache.log4j.Logger.getRootLogger().addAppender(console);
 		SERVER_HOST = InetAddress.getByName("localhost");
 	}
-	
+
 	@Test
-	public void shouldExchangeAKey() throws Exception {
+	public void shouldExchangeAKey () throws Exception {
 		DatagramEndpoint serverEndpoint = new UDPDatagramEndpoint(SERVER_PORT);
 		KeyExchangeServer server = new KeyExchangeServer(serverEndpoint);
-		
+
 		DatagramEndpoint clientEndpoint = new UDPDatagramEndpoint();
 		CounterpartAddress serverAddress = new CounterpartAddress(SERVER_HOST, SERVER_PORT);
 		KeyExchangeClient client = new KeyExchangeClient(clientEndpoint, serverAddress);
 		ServerThread serverThread = new ServerThread(server);
-		
+
 		serverThread.start();
 		Optional<IdKeyPair> clientKey = client.get(1000, TimeUnit.SECONDS);
 		serverThread.join();
-		
+
 		assertTrue(clientKey.isPresent());
 		assertThat(clientKey.get().getId(), is(equalTo(ID)));
 		assertTrue(serverThread.getServerKey().isPresent());
 		assertThat(serverThread.getServerKey().get().getId(), is(equalTo(ID)));
 		assertThat(serverThread.getServerKey().get().getKey(), is(equalTo(clientKey.get().getKey())));
 	}
-	
-	
+
 	private static class ServerThread extends Thread {
-		
+
 		private KeyExchangeServer server;
 		@Getter
 		private Optional<IdKeyPair> serverKey;
 
-		public ServerThread(KeyExchangeServer server) {
+		public ServerThread (KeyExchangeServer server) {
 			this.server = server;
 		}
-		
+
 		@Override
-		public void run() {
+		public void run () {
 			try {
 				serverKey = server.get(ID, 1000, TimeUnit.SECONDS);
 			} catch (Exception e) {
@@ -83,6 +82,5 @@ public class KeyExchangeTest {
 			}
 		}
 	}
-	
-	
+
 }
