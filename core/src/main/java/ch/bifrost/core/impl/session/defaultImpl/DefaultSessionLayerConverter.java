@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
+import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.session.SessionConverter;
 import ch.bifrost.core.api.session.SessionMessage;
-import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 
 /**
  * The default implementation of the session layer as proposed in the paper. Serves as a base class for both client and server.
@@ -28,9 +28,9 @@ public abstract class DefaultSessionLayerConverter implements SessionConverter, 
 
 	private final BlockingQueue<SessionMessage> queueTowardsUpperLayer = new LinkedBlockingQueue<>();
 	private final DefaultSessionLayerReceiver receiver;
-	private DefaultSessionLayerMessageSender sender; 
+	private DefaultSessionLayerMessageSender sender;
 
-	public DefaultSessionLayerConverter(NetworkEndointForSessionConverter networkAccessPoint) {
+	public DefaultSessionLayerConverter (DatagramEndpoint networkAccessPoint) {
 		sender = new DefaultSessionLayerMessageSender(networkAccessPoint);
 		receiver = new DefaultSessionLayerReceiver(networkAccessPoint, getMessageHandlers(sender, queueTowardsUpperLayer));
 		receiver.start();
@@ -39,27 +39,28 @@ public abstract class DefaultSessionLayerConverter implements SessionConverter, 
 	/**
 	 * Add handlers for all expected message types. Handlers may differ on server and client side.
 	 */
-	protected abstract Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers(DefaultSessionLayerMessageSender sender, BlockingQueue<SessionMessage> queueTowardsUpperLayer);
-	
-	protected DefaultSessionLayerMessageSender getSender() {
+	protected abstract Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers (DefaultSessionLayerMessageSender sender,
+			BlockingQueue<SessionMessage> queueTowardsUpperLayer);
+
+	protected DefaultSessionLayerMessageSender getSender () {
 		return sender;
 	}
-	
+
 	@Override
-	public void send(SessionMessage message) throws IOException {
+	public void send (SessionMessage message) throws IOException {
 		LOG.debug("Encrypting and sending a message");
 		// TODO encrypt message
-		DefaultSessionLayerMessage convertedMessage = new  DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.DATA_PAYLOAD, message.getPayload());
+		DefaultSessionLayerMessage convertedMessage = new DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.DATA_PAYLOAD, message.getPayload());
 		sender.send(convertedMessage);
 	}
 
 	@Override
-	public SessionMessage receive() throws InterruptedException {
+	public SessionMessage receive () throws InterruptedException {
 		return queueTowardsUpperLayer.take();
 	}
 
 	@Override
-	public Optional<SessionMessage> receive(long timeout, TimeUnit unit) throws InterruptedException {
+	public Optional<SessionMessage> receive (long timeout, TimeUnit unit) throws InterruptedException {
 		SessionMessage msg = queueTowardsUpperLayer.poll(TIMEOUT, TIMEOUT_UNIT);
 		if (msg != null) {
 			return Optional.of(msg);
@@ -68,25 +69,25 @@ public abstract class DefaultSessionLayerConverter implements SessionConverter, 
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close () throws IOException {
 		receiver.cancel();
 	}
-	
-	public static class DefaultSessionLayerMessageSender {
-		
-		private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerMessageSender.class);
-	
-		private final NetworkEndointForSessionConverter endpoint;
 
-		public DefaultSessionLayerMessageSender(NetworkEndointForSessionConverter networkAccessPoint) {
+	public static class DefaultSessionLayerMessageSender {
+
+		private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerMessageSender.class);
+
+		private final DatagramEndpoint endpoint;
+
+		public DefaultSessionLayerMessageSender (DatagramEndpoint networkAccessPoint) {
 			this.endpoint = networkAccessPoint;
 		}
-		
-		public void send(DefaultSessionLayerMessage message) throws IOException {
+
+		public void send (DefaultSessionLayerMessage message) throws IOException {
 			LOG.debug("Received a message to be sent.");
-			endpoint.send(message.toSessionMessage());
+			endpoint.send(message.toSessionMessage().toDatagramMessage());
 		}
-		
+
 	}
-	
+
 }

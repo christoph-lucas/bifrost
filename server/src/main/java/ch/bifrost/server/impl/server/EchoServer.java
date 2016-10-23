@@ -1,4 +1,4 @@
-package ch.bifrost.server.impl.session;
+package ch.bifrost.server.impl.server;
 
 import java.util.concurrent.TimeUnit;
 

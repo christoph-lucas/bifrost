@@ -16,12 +16,12 @@ import org.junit.Test;
 
 import com.google.common.base.Optional;
 
-import ch.bifrost.client.impl.session.KeyExchangeClient;
+import ch.bifrost.client.impl.keyexchange.KeyExchangeClient;
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
-import ch.bifrost.core.api.session.IdKeyPair;
+import ch.bifrost.core.api.keyexchange.IdKeyPair;
 import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
-import ch.bifrost.server.impl.session.KeyExchangeServer;
+import ch.bifrost.server.impl.keyexchange.KeyExchangeServer;
 import lombok.Getter;
 
 public class KeyExchangeTest {
