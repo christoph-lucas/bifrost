@@ -15,9 +15,9 @@ import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.impl.MessageCodecUtils;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerConverter;
-import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessage;
-import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessageHandler;
-import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessageIdentifier;
+import ch.bifrost.core.impl.session.defaultImpl.Message;
+import ch.bifrost.core.impl.session.defaultImpl.MessageHandler;
+import ch.bifrost.core.impl.session.defaultImpl.MessageIdentifier;
 import ch.bifrost.core.impl.session.defaultImpl.RekeyReplyHandler;
 
 /**
@@ -32,11 +32,11 @@ public class DefaultClientSessionConverter extends DefaultSessionLayerConverter 
 	}
 
 	@Override
-	protected Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers (DefaultSessionLayerMessageSender sender,
+	protected Map<MessageIdentifier, MessageHandler> getMessageHandlers (DefaultSessionLayerMessageSender sender,
 			BlockingQueue<SessionMessage> queueTowardsUpperLayer) {
-		Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers = new HashMap<>();
-		handlers.put(DefaultSessionLayerMessageIdentifier.DATA_PAYLOAD, new DataPayloadHandler(queueTowardsUpperLayer));
-		handlers.put(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY_REPLY, new RekeyReplyHandler());
+		Map<MessageIdentifier, MessageHandler> handlers = new HashMap<>();
+		handlers.put(MessageIdentifier.DATA_PAYLOAD, new DataPayloadHandler(queueTowardsUpperLayer));
+		handlers.put(MessageIdentifier.CONTROL_REKEY_REPLY, new RekeyReplyHandler());
 		return handlers;
 	}
 
@@ -46,7 +46,7 @@ public class DefaultClientSessionConverter extends DefaultSessionLayerConverter 
 	public void rekey () throws IOException {
 		LOG.debug("Sending rekey message to server");
 		byte[] messageBytes = MessageCodecUtils.encodeStringAsByteArray("Whatever...");
-		getSender().send(new DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY, messageBytes));
+		getSender().send(new Message(MessageIdentifier.CONTROL_REKEY, messageBytes));
 	}
 
 	public static class DefaultClientSessionConverterFactory implements SessionConverterFactory {

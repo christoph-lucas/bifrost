@@ -5,7 +5,7 @@ import lombok.Getter;
 /**
  * The different types of messages in the default session layer.
  */
-public enum DefaultSessionLayerMessageIdentifier {
+public enum MessageIdentifier {
 
 	DATA_PAYLOAD((byte) 1),
 	CONTROL_REKEY((byte) 2),
@@ -16,20 +16,20 @@ public enum DefaultSessionLayerMessageIdentifier {
 	@Getter
 	private final byte[] byteVal;
 
-	private DefaultSessionLayerMessageIdentifier (byte byteVal) {
+	private MessageIdentifier (byte byteVal) {
 		this.byteVal = new byte[] { byteVal };
 	}
 
-	public static DefaultSessionLayerMessageIdentifier from (byte[] bytes) {
+	public static MessageIdentifier from (byte[] bytes) {
 		byte byteVal = bytes[0];
 
 		switch (byteVal) {
 		case 1:
-			return DefaultSessionLayerMessageIdentifier.DATA_PAYLOAD;
+			return MessageIdentifier.DATA_PAYLOAD;
 		case 2:
-			return DefaultSessionLayerMessageIdentifier.CONTROL_REKEY;
+			return MessageIdentifier.CONTROL_REKEY;
 		case 3:
-			return DefaultSessionLayerMessageIdentifier.CONTROL_REKEY_REPLY;
+			return MessageIdentifier.CONTROL_REKEY_REPLY;
 		default:
 			throw new IllegalArgumentException("The given byte array are invalid");
 		}

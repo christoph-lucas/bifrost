@@ -13,19 +13,19 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class DefaultSessionLayerMessage {
+public class Message {
 
-	private final DefaultSessionLayerMessageIdentifier identifier;
+	private final MessageIdentifier identifier;
 	private final byte[] payload;
 
-	public static DefaultSessionLayerMessage from (SessionMessage message) {
+	public static Message from (SessionMessage message) {
 		byte[] byteRepresentation = message.getPayload();
 
-		byte[] identifierBytes = ArrayUtils.subarray(byteRepresentation, 0, DefaultSessionLayerMessageIdentifier.BYTE_REPRESENTATION_LENGTH);
-		DefaultSessionLayerMessageIdentifier identifier = DefaultSessionLayerMessageIdentifier.from(identifierBytes);
-		byte[] payload = ArrayUtils.subarray(byteRepresentation, DefaultSessionLayerMessageIdentifier.BYTE_REPRESENTATION_LENGTH, byteRepresentation.length);
+		byte[] identifierBytes = ArrayUtils.subarray(byteRepresentation, 0, MessageIdentifier.BYTE_REPRESENTATION_LENGTH);
+		MessageIdentifier identifier = MessageIdentifier.from(identifierBytes);
+		byte[] payload = ArrayUtils.subarray(byteRepresentation, MessageIdentifier.BYTE_REPRESENTATION_LENGTH, byteRepresentation.length);
 
-		return new DefaultSessionLayerMessage(identifier, payload);
+		return new Message(identifier, payload);
 	}
 
 	public SessionMessage toSessionMessage () {

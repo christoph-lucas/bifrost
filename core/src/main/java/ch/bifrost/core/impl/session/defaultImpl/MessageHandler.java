@@ -5,8 +5,8 @@ import java.io.IOException;
 /**
  * An abstraction of a message handler in the default session layer.
  */
-public interface DefaultSessionLayerMessageHandler {
+public interface MessageHandler {
 
-	void handle (DefaultSessionLayerMessage receivedMessage) throws IOException;
+	void handle (Message receivedMessage) throws IOException;
 
 }

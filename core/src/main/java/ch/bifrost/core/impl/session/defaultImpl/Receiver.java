@@ -18,18 +18,18 @@ import ch.bifrost.core.api.session.SessionMessage;
  * A receiver thread within the default session layer. Distinguishes between the different sorts of messages and handles
  * each message according to its identifier using an appropriate handler.
  */
-public class DefaultSessionLayerReceiver extends Thread {
+public class Receiver extends Thread {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionLayerReceiver.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Receiver.class);
 
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 
 	private DatagramEndpoint endpoint;
 	private boolean cancelled;
-	private Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers;
+	private Map<MessageIdentifier, MessageHandler> handlers;
 
-	public DefaultSessionLayerReceiver (DatagramEndpoint endpoint, Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers) {
+	public Receiver (DatagramEndpoint endpoint, Map<MessageIdentifier, MessageHandler> handlers) {
 		this.endpoint = endpoint;
 		this.handlers = handlers;
 	}
@@ -52,9 +52,9 @@ public class DefaultSessionLayerReceiver extends Thread {
 				SessionMessage message = SessionMessage.from(datagram.get());
 				endpoint.counterpartAddress((CounterpartAddress) message.getContextData().get(SessionMessage.COUNTERPART_ADDRESS));
 				LOG.debug("Converting to DefaultSessionLayerMessage.");
-				DefaultSessionLayerMessage sessionLayerMessage = DefaultSessionLayerMessage.from(message);
+				Message sessionLayerMessage = Message.from(message);
 				LOG.debug("Looking for handler.");
-				DefaultSessionLayerMessageHandler handler = handlers.get(sessionLayerMessage.getIdentifier());
+				MessageHandler handler = handlers.get(sessionLayerMessage.getIdentifier());
 				if (handler != null) {
 					LOG.debug("Handler found.");
 					handler.handle(sessionLayerMessage);

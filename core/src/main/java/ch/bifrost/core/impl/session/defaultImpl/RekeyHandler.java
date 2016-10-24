@@ -11,7 +11,7 @@ import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerConverter.Def
 /**
  * Handles rekey messages.
  */
-public class RekeyHandler implements DefaultSessionLayerMessageHandler {
+public class RekeyHandler implements MessageHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RekeyHandler.class);
 
@@ -22,11 +22,11 @@ public class RekeyHandler implements DefaultSessionLayerMessageHandler {
 	}
 
 	@Override
-	public void handle (DefaultSessionLayerMessage message) throws IOException {
+	public void handle (Message message) throws IOException {
 		LOG.debug("Received Rekey Message");
 		// for now not much
 		byte[] messageBytes = MessageCodecUtils.encodeStringAsByteArray("I did a rekeying as asked to do.");
-		sender.send(new DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY_REPLY, messageBytes));
+		sender.send(new Message(MessageIdentifier.CONTROL_REKEY_REPLY, messageBytes));
 	}
 
 }

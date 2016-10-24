@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import ch.bifrost.core.api.session.SessionMessage;
 
 /**
- * A {@link DefaultSessionLayerMessageHandler} that simply puts the received message into the queue (for now).
+ * A {@link MessageHandler} that simply puts the received message into the queue (for now).
  */
-public class DataPayloadHandler implements DefaultSessionLayerMessageHandler {
+public class DataPayloadHandler implements MessageHandler {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataPayloadHandler.class);
 	private BlockingQueue<SessionMessage> queue;
@@ -20,7 +20,7 @@ public class DataPayloadHandler implements DefaultSessionLayerMessageHandler {
 	}
 
 	@Override
-	public void handle (DefaultSessionLayerMessage message) {
+	public void handle (Message message) {
 		LOG.debug("Received message with payload. Decrypting and queueing for upper layer.");
 		try {
 			queue.put(new SessionMessage(message.getPayload()));

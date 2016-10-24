@@ -10,8 +10,8 @@ import ch.bifrost.core.api.session.SessionConverterFactory;
 import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
 import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerConverter;
-import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessageHandler;
-import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerMessageIdentifier;
+import ch.bifrost.core.impl.session.defaultImpl.MessageHandler;
+import ch.bifrost.core.impl.session.defaultImpl.MessageIdentifier;
 import ch.bifrost.core.impl.session.defaultImpl.RekeyHandler;
 
 /**
@@ -24,11 +24,11 @@ public class DefaultServerSessionConverter extends DefaultSessionLayerConverter 
 	}
 
 	@Override
-	protected Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers (DefaultSessionLayerMessageSender sender,
+	protected Map<MessageIdentifier, MessageHandler> getMessageHandlers (DefaultSessionLayerMessageSender sender,
 			BlockingQueue<SessionMessage> queueTowardsUpperLayer) {
-		Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers = new HashMap<>();
-		handlers.put(DefaultSessionLayerMessageIdentifier.DATA_PAYLOAD, new DataPayloadHandler(queueTowardsUpperLayer));
-		handlers.put(DefaultSessionLayerMessageIdentifier.CONTROL_REKEY, new RekeyHandler(sender));
+		Map<MessageIdentifier, MessageHandler> handlers = new HashMap<>();
+		handlers.put(MessageIdentifier.DATA_PAYLOAD, new DataPayloadHandler(queueTowardsUpperLayer));
+		handlers.put(MessageIdentifier.CONTROL_REKEY, new RekeyHandler(sender));
 		return handlers;
 	}
 

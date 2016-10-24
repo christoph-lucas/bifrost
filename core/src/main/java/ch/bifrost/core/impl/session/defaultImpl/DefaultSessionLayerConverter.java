@@ -27,19 +27,19 @@ public abstract class DefaultSessionLayerConverter implements SessionConverter, 
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 
 	private final BlockingQueue<SessionMessage> queueTowardsUpperLayer = new LinkedBlockingQueue<>();
-	private final DefaultSessionLayerReceiver receiver;
+	private final Receiver receiver;
 	private DefaultSessionLayerMessageSender sender;
 
 	public DefaultSessionLayerConverter (DatagramEndpoint networkAccessPoint) {
 		sender = new DefaultSessionLayerMessageSender(networkAccessPoint);
-		receiver = new DefaultSessionLayerReceiver(networkAccessPoint, getMessageHandlers(sender, queueTowardsUpperLayer));
+		receiver = new Receiver(networkAccessPoint, getMessageHandlers(sender, queueTowardsUpperLayer));
 		receiver.start();
 	}
 
 	/**
 	 * Add handlers for all expected message types. Handlers may differ on server and client side.
 	 */
-	protected abstract Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> getMessageHandlers (DefaultSessionLayerMessageSender sender,
+	protected abstract Map<MessageIdentifier, MessageHandler> getMessageHandlers (DefaultSessionLayerMessageSender sender,
 			BlockingQueue<SessionMessage> queueTowardsUpperLayer);
 
 	protected DefaultSessionLayerMessageSender getSender () {
@@ -50,7 +50,7 @@ public abstract class DefaultSessionLayerConverter implements SessionConverter, 
 	public void send (SessionMessage message) throws IOException {
 		LOG.debug("Encrypting and sending a message");
 		// TODO encrypt message
-		DefaultSessionLayerMessage convertedMessage = new DefaultSessionLayerMessage(DefaultSessionLayerMessageIdentifier.DATA_PAYLOAD, message.getPayload());
+		Message convertedMessage = new Message(MessageIdentifier.DATA_PAYLOAD, message.getPayload());
 		sender.send(convertedMessage);
 	}
 
@@ -83,7 +83,7 @@ public abstract class DefaultSessionLayerConverter implements SessionConverter, 
 			this.endpoint = networkAccessPoint;
 		}
 
-		public void send (DefaultSessionLayerMessage message) throws IOException {
+		public void send (Message message) throws IOException {
 			LOG.debug("Received a message to be sent.");
 			endpoint.send(message.toSessionMessage().toDatagramMessage());
 		}
