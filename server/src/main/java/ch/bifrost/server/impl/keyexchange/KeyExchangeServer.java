@@ -1,6 +1,5 @@
 package ch.bifrost.server.impl.keyexchange;
 
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
@@ -8,11 +7,10 @@ import com.google.common.base.Optional;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
+import ch.bifrost.core.api.keyexchange.Key;
 import ch.bifrost.core.api.session.MultiplexingID;
 
 public class KeyExchangeServer {
-
-	private static final int KEY_LENGTH_IN_BYTES = 64;
 
 	private DatagramEndpoint datagramEndpoint;
 
@@ -27,10 +25,7 @@ public class KeyExchangeServer {
 		}
 		DatagramMessage request = receiveOpt.get();
 
-		byte[] key = new byte[KEY_LENGTH_IN_BYTES];
-		ThreadLocalRandom.current().nextBytes(key);
-
-		IdKeyPair idKeyPair = new IdKeyPair(id, key);
+		IdKeyPair idKeyPair = new IdKeyPair(id, Key.createRandomKey());
 
 		DatagramMessage response = new DatagramMessage(request.getCounterpartAddress(), idKeyPair.encode());
 		datagramEndpoint.send(response);
