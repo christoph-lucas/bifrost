@@ -15,12 +15,12 @@ public class KeyExchangeClient {
 	private DatagramEndpoint datagramEndpoint;
 	private CounterpartAddress serverAddress;
 
-	public KeyExchangeClient(DatagramEndpoint datagramEndpoint, CounterpartAddress serverAddress) {
+	public KeyExchangeClient (DatagramEndpoint datagramEndpoint, CounterpartAddress serverAddress) {
 		this.datagramEndpoint = datagramEndpoint;
 		this.serverAddress = serverAddress;
 	}
-	
-	public Optional<IdKeyPair> get(long timeout, TimeUnit unit) throws Exception {
+
+	public Optional<IdKeyPair> get (long timeout, TimeUnit unit) throws Exception {
 		byte[] messageBytes = MessageCodecUtils.encodeStringAsByteArray("Key Exchange Request");
 		DatagramMessage request = new DatagramMessage(serverAddress, messageBytes);
 		datagramEndpoint.send(request);

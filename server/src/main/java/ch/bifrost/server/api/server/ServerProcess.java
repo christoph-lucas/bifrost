@@ -8,6 +8,6 @@ public interface ServerProcess extends Runnable {
 	/**
 	 * Cancels the process. Might or might not have an effect, or might have a timeout before taking effect.
 	 */
-	void cancel();
-	
+	void cancel ();
+
 }

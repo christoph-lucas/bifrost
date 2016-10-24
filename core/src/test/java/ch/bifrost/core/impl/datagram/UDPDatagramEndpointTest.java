@@ -13,7 +13,7 @@ import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.impl.MessageCodecUtils;
 
 public class UDPDatagramEndpointTest {
-	
+
 	private final String SERVER_HOST = "localhost";
 	private final int SERVER_PORT = 34543;
 	private final byte[] CLIENT_MESSAGE = MessageCodecUtils.encodeStringAsByteArray("Hello World!");
@@ -22,19 +22,19 @@ public class UDPDatagramEndpointTest {
 	private UDPDatagramEndpoint clientEndpoint;
 
 	@Before
-	public void setupEndpoints() throws Exception {
+	public void setupEndpoints () throws Exception {
 		serverEndpoint = new UDPDatagramEndpoint(SERVER_PORT);
 		clientEndpoint = new UDPDatagramEndpoint();
 	}
-	
+
 	@After
-	public void closeEndpoints() throws Exception {
+	public void closeEndpoints () throws Exception {
 		serverEndpoint.close();
 		clientEndpoint.close();
 	}
-	
+
 	@Test
-	public void shouldReceiveWhatWasSent() throws Exception {
+	public void shouldReceiveWhatWasSent () throws Exception {
 		CounterpartAddress serverAddress = new CounterpartAddress(SERVER_HOST, SERVER_PORT);
 		DatagramMessage outgoing = new DatagramMessage(serverAddress, CLIENT_MESSAGE);
 
@@ -43,9 +43,9 @@ public class UDPDatagramEndpointTest {
 
 		assertThat(incoming.getPayload(), is(equalTo(CLIENT_MESSAGE)));
 	}
-	
+
 	@Test
-	public void shouldBeAbleToReply() throws Exception {
+	public void shouldBeAbleToReply () throws Exception {
 		CounterpartAddress serverAddress = new CounterpartAddress(SERVER_HOST, SERVER_PORT);
 		DatagramMessage message = new DatagramMessage(serverAddress, CLIENT_MESSAGE);
 		clientEndpoint.send(message);
@@ -53,7 +53,7 @@ public class UDPDatagramEndpointTest {
 		DatagramMessage incoming = serverEndpoint.receive();
 		DatagramMessage reply = new DatagramMessage(incoming.getCounterpartAddress(), SERVER_MESSAGE);
 		serverEndpoint.send(reply);
-		
+
 		DatagramMessage incomingReply = clientEndpoint.receive();
 		assertThat(incomingReply.getPayload(), is(equalTo(SERVER_MESSAGE)));
 	}

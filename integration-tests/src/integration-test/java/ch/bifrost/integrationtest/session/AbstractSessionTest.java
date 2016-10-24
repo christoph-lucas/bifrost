@@ -18,15 +18,15 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true, chain = true)
 public abstract class AbstractSessionTest {
 
-    private static final String SERVER_HOST_NAME = "localhost";
+	private static final String SERVER_HOST_NAME = "localhost";
 	private static final int SERVER_PORT_KEY_EXCHANGE = 12345;
 	private static final int SERVER_PORT_PAYLOAD = 12346;
 	@Getter
 	private SessionClient client;
 	private SessionServer server;
-	
+
 	@BeforeClass
-	public static void setupLogger() {
+	public static void setupLogger () {
 		ConsoleAppender console = new ConsoleAppender();
 		String pattern = "%d [%-5p|%c] %m%n";
 		console.setLayout(new PatternLayout(pattern));
@@ -34,23 +34,22 @@ public abstract class AbstractSessionTest {
 		console.activateOptions();
 		org.apache.log4j.Logger.getRootLogger().addAppender(console);
 	}
-	
+
 	@Before
-	public void setupClientAndServer() throws Exception {
+	public void setupClientAndServer () throws Exception {
 		server = new SessionServer(SERVER_PORT_KEY_EXCHANGE, SERVER_PORT_PAYLOAD, getServerSessionConverterFactory());
 		InetAddress serverHost = InetAddress.getByName(SERVER_HOST_NAME);
 		client = new SessionClient(serverHost, SERVER_PORT_KEY_EXCHANGE, SERVER_PORT_PAYLOAD, getClientSessionConverterFactory());
 	}
 
-	
 	@After
-	public void closeClientAndServer() throws Exception {
+	public void closeClientAndServer () throws Exception {
 		client.close();
 		server.close();
 	}
-	
-	protected abstract SessionConverterFactory getServerSessionConverterFactory();
 
-	protected abstract SessionConverterFactory getClientSessionConverterFactory();
-	
+	protected abstract SessionConverterFactory getServerSessionConverterFactory ();
+
+	protected abstract SessionConverterFactory getClientSessionConverterFactory ();
+
 }

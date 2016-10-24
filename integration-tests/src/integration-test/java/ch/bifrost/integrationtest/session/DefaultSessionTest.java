@@ -18,21 +18,21 @@ import ch.bifrost.server.impl.session.DefaultServerSessionConverter.DefaultServe
 
 public class DefaultSessionTest extends AbstractSessionTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionTest.class);
-	
-    public static final byte[] PING = MessageCodecUtils.encodeStringAsByteArray("ping");
-    public static final byte[] PONG = MessageCodecUtils.encodeStringAsByteArray("pong");
-    
-    protected DefaultServerSessionConverterFactory getServerSessionConverterFactory() {
+	private static final Logger LOG = LoggerFactory.getLogger(DefaultSessionTest.class);
+
+	public static final byte[] PING = MessageCodecUtils.encodeStringAsByteArray("ping");
+	public static final byte[] PONG = MessageCodecUtils.encodeStringAsByteArray("pong");
+
+	protected DefaultServerSessionConverterFactory getServerSessionConverterFactory () {
 		return new DefaultServerSessionConverterFactory();
 	}
 
-	protected DefaultClientSessionConverterFactory getClientSessionConverterFactory() {
+	protected DefaultClientSessionConverterFactory getClientSessionConverterFactory () {
 		return new DefaultClientSessionConverterFactory();
 	}
 
 	@Test
-	public void shouldPlayPingPongOnce() throws Exception {
+	public void shouldPlayPingPongOnce () throws Exception {
 		client().initializeSession(1000, TimeUnit.SECONDS);
 		LOG.info("Client session initialized");
 
@@ -41,31 +41,31 @@ public class DefaultSessionTest extends AbstractSessionTest {
 		LOG.info("---------> Client received a message: '" + MessageCodecUtils.decodeStringFromByteArray(message.getPayload()) + "'");
 		assertThat(message.getPayload(), is(equalTo(PING)));
 	}
-	
+
 	@Test
-	public void shouldPlayPingPongTwice() throws Exception {
+	public void shouldPlayPingPongTwice () throws Exception {
 		client().initializeSession(1000, TimeUnit.SECONDS);
-		
+
 		client().send(new SessionMessage(PING));
 		SessionMessage message = client().receive();
 		LOG.info("---------> Client received a message: '" + MessageCodecUtils.decodeStringFromByteArray(message.getPayload()) + "'");
 		assertThat(message.getPayload(), is(equalTo(PING)));
-		
+
 		client().send(new SessionMessage(PONG));
 		message = client().receive();
 		LOG.info("---------> Client received a message: '" + MessageCodecUtils.decodeStringFromByteArray(message.getPayload()) + "'");
 		assertThat(message.getPayload(), is(equalTo(PONG)));
 	}
-	
+
 	@Test
-	public void shouldPingAndRekey() throws Exception {
+	public void shouldPingAndRekey () throws Exception {
 		DefaultClientSessionConverter clientConverter = (DefaultClientSessionConverter) client().initializeSession(1000, TimeUnit.SECONDS);
-		
+
 		client().send(new SessionMessage(PING));
 		SessionMessage message = client().receive();
 		LOG.info("---------> Client received a message: '" + MessageCodecUtils.decodeStringFromByteArray(message.getPayload()) + "'");
 		assertThat(message.getPayload(), is(equalTo(PING)));
-		
+
 		clientConverter.rekey();
 	}
 

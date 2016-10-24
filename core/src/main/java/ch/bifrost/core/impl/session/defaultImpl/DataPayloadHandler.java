@@ -15,12 +15,12 @@ public class DataPayloadHandler implements DefaultSessionLayerMessageHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(DataPayloadHandler.class);
 	private BlockingQueue<SessionMessage> queue;
 
-	public DataPayloadHandler(BlockingQueue<SessionMessage> queue) {
+	public DataPayloadHandler (BlockingQueue<SessionMessage> queue) {
 		this.queue = queue;
 	}
-	
+
 	@Override
-	public void handle(DefaultSessionLayerMessage message) {
+	public void handle (DefaultSessionLayerMessage message) {
 		LOG.debug("Received message with payload. Decrypting and queueing for upper layer.");
 		try {
 			queue.put(new SessionMessage(message.getPayload()));

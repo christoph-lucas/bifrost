@@ -7,6 +7,6 @@ public interface ServerProcessFactory {
 	/**
 	 * @return a runnable server process that handles this session
 	 */
-	ServerProcess newServerProcess(SessionConverter sessionAdapter);
-	
+	ServerProcess newServerProcess (SessionConverter sessionAdapter);
+
 }
