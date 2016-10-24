@@ -8,6 +8,7 @@ import com.google.common.base.Optional;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
+import ch.bifrost.core.api.session.MultiplexingID;
 
 public class KeyExchangeServer {
 
@@ -19,7 +20,7 @@ public class KeyExchangeServer {
 		this.datagramEndpoint = datagramEndpoint;
 	}
 
-	public Optional<IdKeyPair> get (String id, long timeout, TimeUnit unit) throws Exception {
+	public Optional<IdKeyPair> get (MultiplexingID id, long timeout, TimeUnit unit) throws Exception {
 		Optional<DatagramMessage> receiveOpt = datagramEndpoint.receive(timeout, unit);
 		if (!receiveOpt.isPresent()) {
 			return Optional.absent();

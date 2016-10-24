@@ -2,6 +2,7 @@ package ch.bifrost.server.impl.session;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.server.api.server.ServerProcess;
 
 /**
@@ -9,13 +10,13 @@ import ch.bifrost.server.api.server.ServerProcess;
  */
 public class SessionStore {
 
-	private ConcurrentHashMap<String, SessionState> store = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<MultiplexingID, SessionState> store = new ConcurrentHashMap<>();
 
-	public boolean contains (String id) {
+	public boolean contains (MultiplexingID id) {
 		return store.containsKey(id);
 	}
 
-	public void put (String id, ServerProcess serverProcess) {
+	public void put (MultiplexingID id, ServerProcess serverProcess) {
 		store.put(id, SessionState.builder()
 				.id(id)
 				.serverProcess(serverProcess)
@@ -23,11 +24,11 @@ public class SessionStore {
 				.build());
 	}
 
-	public SessionState get (String id) {
+	public SessionState get (MultiplexingID id) {
 		return store.get(id);
 	}
 
-	public void kill (String id) {
+	public void kill (MultiplexingID id) {
 		store.get(id).kill();
 	}
 
