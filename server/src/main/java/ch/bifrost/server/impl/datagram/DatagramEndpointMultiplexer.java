@@ -16,6 +16,7 @@ import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
+import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithId;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithIdSender;
 import ch.bifrost.core.impl.datagram.MultiplexedDatagramEndpoint;
@@ -32,7 +33,7 @@ public class DatagramEndpointMultiplexer implements Closeable {
 
 	private final MultiplexingReceiver receiver;
 	private final DatagramMessageWithIdSender sessionPacketSender;
-	private final Map<String, BlockingQueue<DatagramMessageWithId>> endpoints = new HashMap<>();
+	private final Map<MultiplexingID, BlockingQueue<DatagramMessageWithId>> endpoints = new HashMap<>();
 
 	public DatagramEndpointMultiplexer (DatagramEndpoint datagramEndpoint) throws SocketException {
 		sessionPacketSender = new DatagramMessageWithIdSender(datagramEndpoint);
@@ -45,7 +46,7 @@ public class DatagramEndpointMultiplexer implements Closeable {
 		receiver.cancel();
 	}
 
-	public MultiplexedDatagramEndpoint registerSessionID (String id) {
+	public MultiplexedDatagramEndpoint registerSessionID (MultiplexingID id) {
 		if (endpoints.containsKey(id)) {
 			throw new DuplicateMultiplexingIdException("The ID " + id + " is already registered.");
 		}
@@ -80,7 +81,7 @@ public class DatagramEndpointMultiplexer implements Closeable {
 				}
 				LOG.debug("Received a message: " + datagram.get());
 				DatagramMessageWithId datagramMessageWithId = DatagramMessageWithId.from(datagram.get());
-				String id = datagramMessageWithId.getMultiplexingId();
+				MultiplexingID id = datagramMessageWithId.getMultiplexingId();
 				if (id == null || !endpoints.containsKey(id)) {
 					LOG.warn("Received unknown multiplexing ID: " + id);
 					continue;

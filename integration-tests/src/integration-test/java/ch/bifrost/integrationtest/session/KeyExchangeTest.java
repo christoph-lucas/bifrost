@@ -20,6 +20,8 @@ import ch.bifrost.client.impl.keyexchange.KeyExchangeClient;
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
+import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.impl.MessageCodecUtils;
 import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
 import ch.bifrost.server.impl.keyexchange.KeyExchangeServer;
 import lombok.Getter;
@@ -29,7 +31,8 @@ public class KeyExchangeTest {
 	private static InetAddress SERVER_HOST;
 	private static final int SERVER_PORT = 4567;
 	// ID must be 32 bytes
-	private static final String ID = "01234567890123456789012345678912";
+	private static final MultiplexingID ID = MultiplexingID.fromBytes(
+			MessageCodecUtils.encodeStringAsByteArrayWithFixedLength("01234567890123456789012345678912", MultiplexingID.LENGTH_IN_BYTES));
 
 	@BeforeClass
 	public static void setupLogger () throws Exception {

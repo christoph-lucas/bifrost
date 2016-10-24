@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 
+import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithId;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithIdSender;
 import ch.bifrost.core.impl.datagram.MultiplexedDatagramEndpoint;
@@ -17,7 +18,7 @@ public class ServerMultiplexedDatagramEndpoint extends MultiplexedDatagramEndpoi
 
 	private final BlockingQueue<DatagramMessageWithId> receivedMessages;
 
-	public ServerMultiplexedDatagramEndpoint (DatagramMessageWithIdSender sessionPacketSender, BlockingQueue<DatagramMessageWithId> receivedMessages, String multiplexingId) {
+	public ServerMultiplexedDatagramEndpoint (DatagramMessageWithIdSender sessionPacketSender, BlockingQueue<DatagramMessageWithId> receivedMessages, MultiplexingID multiplexingId) {
 		super(sessionPacketSender, multiplexingId);
 		this.receivedMessages = receivedMessages;
 	}

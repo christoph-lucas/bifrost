@@ -8,6 +8,7 @@ import com.google.common.base.Optional;
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
+import ch.bifrost.core.api.session.MultiplexingID;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -15,11 +16,11 @@ import lombok.experimental.Accessors;
 public abstract class MultiplexedDatagramEndpoint implements DatagramEndpoint {
 
 	private final DatagramMessageWithIdSender sessionPacketSender;
-	private final String multiplexingId;
+	private final MultiplexingID multiplexingId;
 	@Setter
 	private CounterpartAddress counterpartAddress;
 
-	public MultiplexedDatagramEndpoint (DatagramMessageWithIdSender sessionPacketSender, String multiplexingId) {
+	public MultiplexedDatagramEndpoint (DatagramMessageWithIdSender sessionPacketSender, MultiplexingID multiplexingId) {
 		this.sessionPacketSender = sessionPacketSender;
 		this.multiplexingId = multiplexingId;
 	}

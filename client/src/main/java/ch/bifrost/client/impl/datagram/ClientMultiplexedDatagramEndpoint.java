@@ -8,6 +8,7 @@ import com.google.common.base.Optional;
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
+import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithId;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithIdSender;
 import ch.bifrost.core.impl.datagram.MultiplexedDatagramEndpoint;
@@ -20,7 +21,7 @@ public class ClientMultiplexedDatagramEndpoint extends MultiplexedDatagramEndpoi
 
 	private DatagramEndpoint datagramEndpoint;
 
-	public ClientMultiplexedDatagramEndpoint (CounterpartAddress serverAddress, DatagramEndpoint datagramEndpoint, String multiplexingId) {
+	public ClientMultiplexedDatagramEndpoint (CounterpartAddress serverAddress, DatagramEndpoint datagramEndpoint, MultiplexingID multiplexingId) {
 		super(new DatagramMessageWithIdSender(datagramEndpoint), multiplexingId);
 		super.counterpartAddress(serverAddress);
 		this.datagramEndpoint = datagramEndpoint;
