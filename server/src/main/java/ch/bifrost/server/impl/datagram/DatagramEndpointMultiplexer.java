@@ -90,7 +90,7 @@ public class DatagramEndpointMultiplexer implements Closeable {
 				try {
 					endpoints.get(id).put(datagramMessageWithId);
 				} catch (InterruptedException e) {
-					LOG.debug("Cannot queue DatagramMessageWithId: " + datagramMessageWithId);
+					LOG.debug("Cannot queue DatagramMessageWithId: " + e.getMessage(), e);
 					e.printStackTrace();
 				}
 			}
