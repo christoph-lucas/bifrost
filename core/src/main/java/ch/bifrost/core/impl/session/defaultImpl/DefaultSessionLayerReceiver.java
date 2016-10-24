@@ -10,8 +10,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.CounterpartAddress;
+import ch.bifrost.core.api.datagram.DatagramEndpoint;
+import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.api.session.SessionMessage;
-import ch.bifrost.core.impl.session.NetworkEndointForSessionConverter;
 
 /**
  * A receiver thread within the default session layer. Distinguishes between the different sorts of messages and handles
@@ -24,33 +25,34 @@ public class DefaultSessionLayerReceiver extends Thread {
 	public static final long TIMEOUT = 100L;
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 
-	private NetworkEndointForSessionConverter endpoint;
+	private DatagramEndpoint endpoint;
 	private boolean cancelled;
 	private Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers;
 
-	public DefaultSessionLayerReceiver(NetworkEndointForSessionConverter endpoint, Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers) {
+	public DefaultSessionLayerReceiver (DatagramEndpoint endpoint, Map<DefaultSessionLayerMessageIdentifier, DefaultSessionLayerMessageHandler> handlers) {
 		this.endpoint = endpoint;
 		this.handlers = handlers;
 	}
-	
+
 	@Override
-	public void run() {
-		while(!cancelled) {
-			Optional<SessionMessage> receivedMessage;
+	public void run () {
+		while (!cancelled) {
+			Optional<DatagramMessage> datagram;
 			try {
-				receivedMessage = endpoint.receive(TIMEOUT, TIMEOUT_UNIT);
+				datagram = endpoint.receive(TIMEOUT, TIMEOUT_UNIT);
 			} catch (Exception e) {
 				LOG.warn("An exception occurred during receiving a message: " + e.getMessage(), e);
 				continue;
 			}
-			if (!receivedMessage.isPresent()) {
+			if (!datagram.isPresent()) {
 				continue;
 			}
 			try {
 				LOG.debug("Received a message. Updating Counterpart Address on network endpoint.");
-				endpoint.counterpartAddress((CounterpartAddress) receivedMessage.get().getContextData().get(SessionMessage.COUNTERPART_ADDRESS)); 
+				SessionMessage message = SessionMessage.from(datagram.get());
+				endpoint.counterpartAddress((CounterpartAddress) message.getContextData().get(SessionMessage.COUNTERPART_ADDRESS));
 				LOG.debug("Converting to DefaultSessionLayerMessage.");
-				DefaultSessionLayerMessage sessionLayerMessage = DefaultSessionLayerMessage.from(receivedMessage.get()); 
+				DefaultSessionLayerMessage sessionLayerMessage = DefaultSessionLayerMessage.from(message);
 				LOG.debug("Looking for handler.");
 				DefaultSessionLayerMessageHandler handler = handlers.get(sessionLayerMessage.getIdentifier());
 				if (handler != null) {
@@ -64,8 +66,8 @@ public class DefaultSessionLayerReceiver extends Thread {
 			}
 		}
 	}
-	
-	public void cancel() {
+
+	public void cancel () {
 		cancelled = true;
 		try {
 			Thread.sleep(TIMEOUT);
@@ -74,5 +76,4 @@ public class DefaultSessionLayerReceiver extends Thread {
 		}
 	}
 
-	
 }

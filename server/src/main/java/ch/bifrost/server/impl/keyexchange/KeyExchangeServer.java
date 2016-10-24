@@ -1,4 +1,4 @@
-package ch.bifrost.server.impl.session;
+package ch.bifrost.server.impl.keyexchange;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -7,7 +7,7 @@ import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
-import ch.bifrost.core.api.session.IdKeyPair;
+import ch.bifrost.core.api.keyexchange.IdKeyPair;
 
 public class KeyExchangeServer  {
 
