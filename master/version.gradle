@@ -1,0 +1,23 @@
+project.ext.versionFromGit = getVersion()
+
+String getVersion() {
+	def stdout = new ByteArrayOutputStream()
+	exec {
+		commandLine(describeCommand())
+		standardOutput = stdout
+	}
+	return stdout.toString().trim()
+}
+
+
+String[] describeCommand() {
+	List<String> command = [
+		'git',
+		'describe',
+		'--always',
+		'--dirty',
+		'--tags',
+		'--first-parent'
+	]
+	return command.toArray()
+}
