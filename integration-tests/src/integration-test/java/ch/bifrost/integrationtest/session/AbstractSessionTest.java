@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 
 import ch.bifrost.client.impl.session.SessionClient;
 import ch.bifrost.core.api.session.SessionConverterFactory;
+import ch.bifrost.server.impl.server.EchoServer.EchoServerFactory;
 import ch.bifrost.server.impl.session.SessionServer;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -37,7 +38,7 @@ public abstract class AbstractSessionTest {
 
 	@Before
 	public void setupClientAndServer () throws Exception {
-		server = new SessionServer(SERVER_PORT_KEY_EXCHANGE, SERVER_PORT_PAYLOAD, getServerSessionConverterFactory());
+		server = new SessionServer(SERVER_PORT_KEY_EXCHANGE, SERVER_PORT_PAYLOAD, getServerSessionConverterFactory(), new EchoServerFactory());
 		InetAddress serverHost = InetAddress.getByName(SERVER_HOST_NAME);
 		client = new SessionClient(serverHost, SERVER_PORT_KEY_EXCHANGE, SERVER_PORT_PAYLOAD, getClientSessionConverterFactory());
 	}

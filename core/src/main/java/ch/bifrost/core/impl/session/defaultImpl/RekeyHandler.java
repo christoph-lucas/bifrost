@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.bifrost.core.impl.MessageCodecUtils;
-import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerConverter.DefaultSessionLayerMessageSender;
+import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionConverter.DefaultSessionLayerMessageSender;
 
 /**
  * Handles rekey messages.

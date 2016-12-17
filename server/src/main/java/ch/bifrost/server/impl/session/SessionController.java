@@ -19,9 +19,9 @@ import ch.bifrost.server.api.server.ServerProcessFactory;
 import ch.bifrost.server.impl.datagram.DatagramEndpointMultiplexer;
 import ch.bifrost.server.impl.keyexchange.KeyExchangeServer;
 
-public class SessionInitializer extends Thread {
+public class SessionController extends Thread {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SessionInitializer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SessionController.class);
 
 	private static final int NUM_THREADS = 10;
 	private static final long TIMEOUT = 100L;
@@ -36,7 +36,7 @@ public class SessionInitializer extends Thread {
 	private boolean cancelled;
 	private ExecutorService threadPool;
 
-	public SessionInitializer (KeyExchangeServer keyExchange, DatagramEndpointMultiplexer multiplexer, SessionConverterFactory sessionConverterFactory, ServerProcessFactory serverFactory) {
+	public SessionController (KeyExchangeServer keyExchange, DatagramEndpointMultiplexer multiplexer, SessionConverterFactory sessionConverterFactory, ServerProcessFactory serverFactory) {
 		this.keyExchange = keyExchange;
 		this.multiplexer = multiplexer;
 		this.sessionConverterFactory = sessionConverterFactory;

@@ -50,6 +50,7 @@ public class Receiver extends Thread {
 			try {
 				LOG.debug("Received a message. Updating Counterpart Address on network endpoint.");
 				SessionMessage message = SessionMessage.from(datagram.get());
+				// TODO #19 The counterpart address should be set by the DefaultSessionConverter or by a MessageHandler, not automatically
 				endpoint.counterpartAddress((CounterpartAddress) message.getContextData().get(SessionMessage.COUNTERPART_ADDRESS));
 				LOG.debug("Converting to DefaultSessionLayerMessage.");
 				Message sessionLayerMessage = Message.from(message);

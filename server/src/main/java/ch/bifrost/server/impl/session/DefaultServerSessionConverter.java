@@ -9,7 +9,7 @@ import ch.bifrost.core.api.keyexchange.IdKeyPair;
 import ch.bifrost.core.api.session.SessionConverterFactory;
 import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.impl.session.defaultImpl.DataPayloadHandler;
-import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionLayerConverter;
+import ch.bifrost.core.impl.session.defaultImpl.DefaultSessionConverter;
 import ch.bifrost.core.impl.session.defaultImpl.MessageHandler;
 import ch.bifrost.core.impl.session.defaultImpl.MessageIdentifier;
 import ch.bifrost.core.impl.session.defaultImpl.RekeyHandler;
@@ -17,7 +17,7 @@ import ch.bifrost.core.impl.session.defaultImpl.RekeyHandler;
 /**
  * The server side adapter for the default session layer.
  */
-public class DefaultServerSessionConverter extends DefaultSessionLayerConverter {
+public class DefaultServerSessionConverter extends DefaultSessionConverter {
 
 	public DefaultServerSessionConverter (DatagramEndpoint endpoint, IdKeyPair key) {
 		super(endpoint);
