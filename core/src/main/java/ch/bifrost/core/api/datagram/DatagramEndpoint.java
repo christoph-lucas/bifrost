@@ -15,7 +15,7 @@ public interface DatagramEndpoint extends Closeable {
 	 * Send the given packet to the address given in the packet.
 	 * 
 	 * @param packet the packet to be sent
-	 * @throws IOException thrown if an error occurrs
+	 * @throws IOException thrown if an error occurs
 	 */
 	void send (DatagramMessage packet) throws IOException;
 
