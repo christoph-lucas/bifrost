@@ -8,6 +8,7 @@ import ch.bifrost.core.api.session.SessionConverterFactory;
 import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
 import ch.bifrost.server.api.server.ServerProcessFactory;
 import ch.bifrost.server.impl.datagram.DatagramEndpointMultiplexer;
+import ch.bifrost.server.impl.keyexchange.DHKeyExchangeServer;
 import ch.bifrost.server.impl.keyexchange.KeyExchangeServer;
 
 /**
@@ -21,7 +22,7 @@ public class SessionServer implements Closeable {
 
 	public SessionServer (int serverKeyExchangePort, int serverPayloadPort, SessionConverterFactory sessionConverterFactory, ServerProcessFactory serverFactory) throws SocketException {
 		serverKeyExchangeDatagramEndpoint = new UDPDatagramEndpoint(serverKeyExchangePort);
-		KeyExchangeServer keyExchangeServer = new KeyExchangeServer(serverKeyExchangeDatagramEndpoint);
+		KeyExchangeServer keyExchangeServer = new DHKeyExchangeServer(serverKeyExchangeDatagramEndpoint);
 		serverPayloadDatagramEndpoint = new UDPDatagramEndpoint(serverPayloadPort);
 		DatagramEndpointMultiplexer multiplexer = new DatagramEndpointMultiplexer(serverPayloadDatagramEndpoint);
 		server = new SessionController(keyExchangeServer, multiplexer, sessionConverterFactory, serverFactory);

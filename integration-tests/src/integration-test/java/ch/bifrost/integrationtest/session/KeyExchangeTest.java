@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import com.google.common.base.Optional;
 
+import ch.bifrost.client.impl.keyexchange.DHKeyExchangeClient;
 import ch.bifrost.client.impl.keyexchange.KeyExchangeClient;
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
@@ -23,6 +24,7 @@ import ch.bifrost.core.api.keyexchange.IdKeyPair;
 import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.impl.MessageCodecUtils;
 import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
+import ch.bifrost.server.impl.keyexchange.DHKeyExchangeServer;
 import ch.bifrost.server.impl.keyexchange.KeyExchangeServer;
 import lombok.Getter;
 
@@ -48,11 +50,11 @@ public class KeyExchangeTest {
 	@Test
 	public void shouldExchangeAKey () throws Exception {
 		DatagramEndpoint serverEndpoint = new UDPDatagramEndpoint(SERVER_PORT);
-		KeyExchangeServer server = new KeyExchangeServer(serverEndpoint);
+		KeyExchangeServer server = new DHKeyExchangeServer(serverEndpoint);
 
 		DatagramEndpoint clientEndpoint = new UDPDatagramEndpoint();
 		CounterpartAddress serverAddress = new CounterpartAddress(SERVER_HOST, SERVER_PORT);
-		KeyExchangeClient client = new KeyExchangeClient(clientEndpoint, serverAddress);
+		KeyExchangeClient client = new DHKeyExchangeClient(clientEndpoint, serverAddress);
 		ServerThread serverThread = new ServerThread(server);
 
 		serverThread.start();

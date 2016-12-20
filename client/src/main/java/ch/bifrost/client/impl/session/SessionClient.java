@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.base.Optional;
 
 import ch.bifrost.client.impl.datagram.ClientMultiplexedDatagramEndpoint;
+import ch.bifrost.client.impl.keyexchange.DHKeyExchangeClient;
 import ch.bifrost.client.impl.keyexchange.KeyExchangeClient;
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
@@ -40,7 +41,7 @@ public class SessionClient implements Closeable {
 
 		clientKeyExchangeDatagramEndpoint = new UDPDatagramEndpoint();
 		CounterpartAddress serverKeyExchangeAddress = new CounterpartAddress(serverHost, serverKeyExchangePort);
-		keyExchange = new KeyExchangeClient(clientKeyExchangeDatagramEndpoint, serverKeyExchangeAddress);
+		keyExchange = new DHKeyExchangeClient(clientKeyExchangeDatagramEndpoint, serverKeyExchangeAddress);
 
 		clientPayloadDatagramEndpoint = new UDPDatagramEndpoint();
 	}
