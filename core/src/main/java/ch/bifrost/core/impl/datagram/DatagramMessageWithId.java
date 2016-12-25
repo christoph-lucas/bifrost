@@ -15,14 +15,15 @@ import lombok.ToString;
  * FORMAT: Session ID (32 bytes) | payload
  */
 @Getter
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class DatagramMessageWithId extends DatagramMessage {
+@EqualsAndHashCode
+@ToString
+public class DatagramMessageWithId {
 
-	private MultiplexingID multiplexingId;
+	private final DatagramMessage plainDatagram;
+	private final MultiplexingID multiplexingId;
 
 	public DatagramMessageWithId (CounterpartAddress address, byte[] payload, MultiplexingID multiplexingId) {
-		super(address, payload);
+		this.plainDatagram = new DatagramMessage(address, payload);
 		this.multiplexingId = multiplexingId;
 	}
 
@@ -38,8 +39,8 @@ public class DatagramMessageWithId extends DatagramMessage {
 
 	public DatagramMessage toDatagramMessage () {
 		byte[] multiplexingIdBytesCorrectLength = multiplexingId.toBytes();
-		byte[] datagramMessagePayload = ArrayUtils.addAll(multiplexingIdBytesCorrectLength, getPayload());
-		return new DatagramMessage(getCounterpartAddress(), datagramMessagePayload);
+		byte[] datagramMessagePayload = ArrayUtils.addAll(multiplexingIdBytesCorrectLength, this.plainDatagram.getPayload());
+		return new DatagramMessage(this.plainDatagram.getCounterpartAddress(), datagramMessagePayload);
 	}
 
 }
