@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
-import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.api.session.SessionConverter;
 import ch.bifrost.core.api.session.SessionConverterFactory;
 import ch.bifrost.server.api.server.ServerProcess;

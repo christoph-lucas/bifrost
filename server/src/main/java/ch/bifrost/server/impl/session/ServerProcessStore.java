@@ -2,7 +2,7 @@ package ch.bifrost.server.impl.session;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import ch.bifrost.server.api.server.ServerProcess;
 
 /**

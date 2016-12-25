@@ -1,6 +1,6 @@
 package ch.bifrost.server.impl.session;
 
-import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import ch.bifrost.server.api.server.ServerProcess;
 import lombok.Builder;
 import lombok.Data;
