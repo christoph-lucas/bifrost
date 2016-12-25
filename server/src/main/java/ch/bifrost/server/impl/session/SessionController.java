@@ -31,7 +31,7 @@ public class SessionController extends Thread {
 	private ServerProcessFactory serverFactory;
 	private KeyExchangeServer keyExchange;
 	private DatagramEndpointMultiplexer multiplexer;
-	private final SessionStore sessionStore = new SessionStore();
+	private final ServerProcessStore sessionStore = new ServerProcessStore();
 
 	private boolean cancelled;
 	private ExecutorService threadPool;
@@ -69,7 +69,7 @@ public class SessionController extends Thread {
 			LOG.debug("Received new Key with ID: " + idKeyPair.getId());
 			SessionConverter sessionconverter = sessionConverterFactory.newSessionConverter(singleSessionEndpoint, idKeyPair);
 			ServerProcess newServerProcess = serverFactory.newServerProcess(sessionconverter);
-			sessionStore.put(idKeyPair.getId(), newServerProcess);
+			sessionStore.put(newServerProcess);
 			threadPool.submit(newServerProcess);
 
 			nextId = MultiplexingID.createRandomId();

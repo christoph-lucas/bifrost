@@ -1,6 +1,5 @@
 package ch.bifrost.server.impl.session;
 
-import ch.bifrost.core.api.datagram.MultiplexingID;
 import ch.bifrost.server.api.server.ServerProcess;
 import lombok.Builder;
 import lombok.Data;
@@ -10,9 +9,8 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class SessionState {
+public class ServerProcessState {
 
-	private final MultiplexingID id;
 	private ServerProcess serverProcess;
 	private boolean alive;
 

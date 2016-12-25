@@ -2,33 +2,23 @@ package ch.bifrost.server.impl.session;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import ch.bifrost.core.api.datagram.MultiplexingID;
 import ch.bifrost.server.api.server.ServerProcess;
 
 /**
  * Stores all sessions with an attached state.
  */
-public class SessionStore {
+public class ServerProcessStore {
 
-	private ConcurrentHashMap<MultiplexingID, SessionState> store = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, ServerProcessState> store = new ConcurrentHashMap<>();
 
-	public boolean contains (MultiplexingID id) {
-		return store.containsKey(id);
-	}
-
-	public void put (MultiplexingID id, ServerProcess serverProcess) {
-		store.put(id, SessionState.builder()
-				.id(id)
+	public void put (ServerProcess serverProcess) {
+		store.put(serverProcess.getId(), ServerProcessState.builder()
 				.serverProcess(serverProcess)
 				.alive(true)
 				.build());
 	}
 
-	public SessionState get (MultiplexingID id) {
-		return store.get(id);
-	}
-
-	public void kill (MultiplexingID id) {
+	public void kill (String id) {
 		store.get(id).kill();
 	}
 
