@@ -6,9 +6,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.bifrost.core.api.config.BifrostConfiguration;
+import ch.bifrost.core.api.config.SessionConverterConfiguration.SessionConverterType;
 import ch.bifrost.core.api.session.SessionMessage;
 import ch.bifrost.core.impl.MessageCodecUtils;
-import ch.bifrost.core.impl.session.NoCryptoSessionConverter.NoCryptoSessionConverterFactory;
 
 public class NoCryptoSessionTest extends AbstractSessionTest {
 
@@ -17,12 +18,10 @@ public class NoCryptoSessionTest extends AbstractSessionTest {
 	public static final byte[] PING = MessageCodecUtils.encodeStringAsByteArray("ping");
 	public static final byte[] PONG = MessageCodecUtils.encodeStringAsByteArray("pong");
 
-	protected NoCryptoSessionConverterFactory getServerSessionConverterFactory () {
-		return new NoCryptoSessionConverterFactory();
-	}
-
-	protected NoCryptoSessionConverterFactory getClientSessionConverterFactory () {
-		return new NoCryptoSessionConverterFactory();
+	protected BifrostConfiguration getConfig () {
+		BifrostConfiguration config = super.getConfig();
+		config.sessionConverter().type(SessionConverterType.NO_CRYPTO);
+		return config;
 	}
 
 	@Test

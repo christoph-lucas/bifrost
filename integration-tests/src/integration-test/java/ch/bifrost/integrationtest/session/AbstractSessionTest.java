@@ -1,7 +1,5 @@
 package ch.bifrost.integrationtest.session;
 
-import java.net.InetAddress;
-
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
@@ -9,9 +7,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import com.google.inject.Guice;
+
+import ch.bifrost.client.impl.dependencyInjection.ClientServiceBinder;
 import ch.bifrost.client.impl.session.SessionClient;
-import ch.bifrost.core.api.session.SessionConverterFactory;
-import ch.bifrost.server.impl.server.EchoServer.EchoServerFactory;
+import ch.bifrost.core.api.config.BifrostConfiguration;
+import ch.bifrost.server.impl.dependencyInjection.ServerServiceBinder;
 import ch.bifrost.server.impl.session.SessionServer;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -38,9 +39,17 @@ public abstract class AbstractSessionTest {
 
 	@Before
 	public void setupClientAndServer () throws Exception {
-		server = new SessionServer(SERVER_PORT_KEY_EXCHANGE, SERVER_PORT_PAYLOAD, getServerSessionConverterFactory(), new EchoServerFactory());
-		InetAddress serverHost = InetAddress.getByName(SERVER_HOST_NAME);
-		client = new SessionClient(serverHost, SERVER_PORT_KEY_EXCHANGE, SERVER_PORT_PAYLOAD, getClientSessionConverterFactory());
+		server = Guice.createInjector(new ServerServiceBinder(getConfig())).getInstance(SessionServer.class);
+		client = Guice.createInjector(new ClientServiceBinder(getConfig())).getInstance(SessionClient.class);
+	}
+
+	protected BifrostConfiguration getConfig () {
+		BifrostConfiguration config = new BifrostConfiguration();
+		config.server()
+				.serverHostName(SERVER_HOST_NAME)
+				.serverKeyExchangePort(SERVER_PORT_KEY_EXCHANGE)
+				.serverPayloadPort(SERVER_PORT_PAYLOAD);
+		return config;
 	}
 
 	@After
@@ -48,9 +57,5 @@ public abstract class AbstractSessionTest {
 		client.close();
 		server.close();
 	}
-
-	protected abstract SessionConverterFactory getServerSessionConverterFactory ();
-
-	protected abstract SessionConverterFactory getClientSessionConverterFactory ();
 
 }
