@@ -19,7 +19,7 @@ public class CounterpartAddressProvider implements Provider<CounterpartAddress> 
 		try {
 			ip = InetAddress.getByName(host);
 		} catch (UnknownHostException e) {
-			throw new RuntimeException();
+			throw new DependencyInjectionException("Cannot resolve Host: " + e.getMessage(), e);
 		}
 	}
 	

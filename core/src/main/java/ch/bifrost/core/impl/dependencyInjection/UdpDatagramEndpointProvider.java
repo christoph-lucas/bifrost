@@ -17,7 +17,7 @@ public class UdpDatagramEndpointProvider implements Provider<UDPDatagramEndpoint
 		try {
 			return new UDPDatagramEndpoint(port);
 		} catch (SocketException e) {
-			throw new RuntimeException();
+			throw new DependencyInjectionException("Cannot open udp port '" + port + "': " + e.getMessage(), e);
 		}
 	}
 
