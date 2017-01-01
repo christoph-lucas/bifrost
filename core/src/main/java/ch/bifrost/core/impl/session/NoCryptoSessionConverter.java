@@ -64,6 +64,7 @@ public class NoCryptoSessionConverter implements SessionConverter {
 	}
 
 	public static interface NoCryptoSessionConverterFactory extends SessionConverterFactory {
+		@Override
 		NoCryptoSessionConverter create(DatagramEndpoint networkAccessPoint, IdKeyPair key);
 	}
 	

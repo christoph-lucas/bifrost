@@ -18,7 +18,6 @@ import com.google.common.base.Optional;
 
 import ch.bifrost.client.impl.keyexchange.KeyExchangeClient;
 import ch.bifrost.core.api.datagram.CounterpartAddress;
-import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
 import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.impl.MessageCodecUtils;
@@ -47,23 +46,23 @@ public class KeyExchangeTest {
 
 	@Test
 	public void shouldExchangeAKey () throws Exception {
-		DatagramEndpoint serverEndpoint = new UDPDatagramEndpoint(SERVER_PORT);
-		KeyExchangeServer server = new KeyExchangeServer(serverEndpoint);
-
-		DatagramEndpoint clientEndpoint = new UDPDatagramEndpoint();
 		CounterpartAddress serverAddress = new CounterpartAddress(SERVER_HOST, SERVER_PORT);
-		KeyExchangeClient client = new KeyExchangeClient(clientEndpoint, serverAddress);
-		ServerThread serverThread = new ServerThread(server);
+		try (
+				KeyExchangeServer server = new KeyExchangeServer(new UDPDatagramEndpoint(SERVER_PORT));
+				KeyExchangeClient client = new KeyExchangeClient(new UDPDatagramEndpoint(), serverAddress)
+		) {
+			ServerThread serverThread = new ServerThread(server);
 
-		serverThread.start();
-		Optional<IdKeyPair> clientKey = client.get(1000, TimeUnit.SECONDS);
-		serverThread.join();
+			serverThread.start();
+			Optional<IdKeyPair> clientKey = client.get(1000, TimeUnit.SECONDS);
+			serverThread.join();
 
-		assertTrue(clientKey.isPresent());
-		assertThat(clientKey.get().getId(), is(equalTo(ID)));
-		assertTrue(serverThread.getServerKey().isPresent());
-		assertThat(serverThread.getServerKey().get().getId(), is(equalTo(ID)));
-		assertThat(serverThread.getServerKey().get().getKey(), is(equalTo(clientKey.get().getKey())));
+			assertTrue(clientKey.isPresent());
+			assertThat(clientKey.get().getId(), is(equalTo(ID)));
+			assertTrue(serverThread.getServerKey().isPresent());
+			assertThat(serverThread.getServerKey().get().getId(), is(equalTo(ID)));
+			assertThat(serverThread.getServerKey().get().getKey(), is(equalTo(clientKey.get().getKey())));
+		}
 	}
 
 	private static class ServerThread extends Thread {
