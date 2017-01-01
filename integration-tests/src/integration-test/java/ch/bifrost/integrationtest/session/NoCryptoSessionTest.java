@@ -18,9 +18,10 @@ public class NoCryptoSessionTest extends AbstractSessionTest {
 	public static final byte[] PING = MessageCodecUtils.encodeStringAsByteArray("ping");
 	public static final byte[] PONG = MessageCodecUtils.encodeStringAsByteArray("pong");
 
+	@Override
 	protected BifrostConfiguration getConfig () {
 		BifrostConfiguration config = super.getConfig();
-		config.sessionConverter().type(SessionConverterType.NO_CRYPTO);
+		config.getSessionConverter().setType(SessionConverterType.NO_CRYPTO);
 		return config;
 	}
 

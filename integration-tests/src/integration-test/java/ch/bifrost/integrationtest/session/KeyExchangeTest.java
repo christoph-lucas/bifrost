@@ -66,9 +66,9 @@ public class KeyExchangeTest {
 
 	protected BifrostConfiguration getConfig () {
 		BifrostConfiguration config = new BifrostConfiguration();
-		config.server()
-				.serverHostName(SERVER_HOST_NAME)
-				.serverKeyExchangePort(SERVER_PORT_KEY_EXCHANGE);
+		config.getServer()
+				.setServerHostName(SERVER_HOST_NAME)
+				.setServerKeyExchangePort(SERVER_PORT_KEY_EXCHANGE);
 		return config;
 	}
 

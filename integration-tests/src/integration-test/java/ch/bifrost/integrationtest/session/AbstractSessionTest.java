@@ -45,10 +45,10 @@ public abstract class AbstractSessionTest {
 
 	protected BifrostConfiguration getConfig () {
 		BifrostConfiguration config = new BifrostConfiguration();
-		config.server()
-				.serverHostName(SERVER_HOST_NAME)
-				.serverKeyExchangePort(SERVER_PORT_KEY_EXCHANGE)
-				.serverPayloadPort(SERVER_PORT_PAYLOAD);
+		config.getServer()
+				.setServerHostName(SERVER_HOST_NAME)
+				.setServerKeyExchangePort(SERVER_PORT_KEY_EXCHANGE)
+				.setServerPayloadPort(SERVER_PORT_PAYLOAD);
 		return config;
 	}
 

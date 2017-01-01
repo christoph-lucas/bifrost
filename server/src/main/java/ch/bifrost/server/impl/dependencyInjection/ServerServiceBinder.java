@@ -33,31 +33,31 @@ public class ServerServiceBinder extends ServiceBinder {
 		bind(BifrostConfiguration.class).toInstance(this.config);
 
 		bind(DatagramEndpoint.class).annotatedWith(KeyExchange.class)
-				.toProvider(new UdpDatagramEndpointProvider(config.server().serverKeyExchangePort())).in(Singleton.class);
+				.toProvider(new UdpDatagramEndpointProvider(config.getServer().getServerKeyExchangePort())).in(Singleton.class);
 		bind(DatagramEndpoint.class).annotatedWith(Payload.class)
-				.toProvider(new UdpDatagramEndpointProvider(config.server().serverPayloadPort())).in(Singleton.class);
-		
-		switch (config.sessionConverter().type()) {
-		case DEFAULT:
-			install(new FactoryModuleBuilder()
-					.implement(SessionConverter.class, NoCryptoSessionConverter.class)
-					.build(DefaultServerSessionConverterFactory.class));
-			bind(SessionConverterFactory.class).to(DefaultServerSessionConverterFactory.class);
-			break;
-		case NO_CRYPTO:
-			install(new FactoryModuleBuilder()
-					.implement(SessionConverter.class, NoCryptoSessionConverter.class)
-					.build(NoCryptoSessionConverterFactory.class));
-			bind(SessionConverterFactory.class).to(NoCryptoSessionConverterFactory.class);
-			break;
-		default:
-			// throw some error or something
-			break;
+				.toProvider(new UdpDatagramEndpointProvider(config.getServer().getServerPayloadPort())).in(Singleton.class);
+
+		switch (config.getSessionConverter().getType()) {
+			case DEFAULT:
+				install(new FactoryModuleBuilder()
+						.implement(SessionConverter.class, NoCryptoSessionConverter.class)
+						.build(DefaultServerSessionConverterFactory.class));
+				bind(SessionConverterFactory.class).to(DefaultServerSessionConverterFactory.class);
+				break;
+			case NO_CRYPTO:
+				install(new FactoryModuleBuilder()
+						.implement(SessionConverter.class, NoCryptoSessionConverter.class)
+						.build(NoCryptoSessionConverterFactory.class));
+				bind(SessionConverterFactory.class).to(NoCryptoSessionConverterFactory.class);
+				break;
+			default:
+				// throw some error or something
+				break;
 		}
 
 		// TODO there should probably be a better way than to hardcode this
 		bind(ServerProcessFactory.class).to(EchoServerFactory.class);
-		
+
 	}
 
 }

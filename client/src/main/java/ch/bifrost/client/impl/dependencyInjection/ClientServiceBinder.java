@@ -23,11 +23,11 @@ public class ClientServiceBinder extends ServiceBinder {
 
 	private BifrostConfiguration config;
 
-	public ClientServiceBinder(BifrostConfiguration config) {
+	public ClientServiceBinder (BifrostConfiguration config) {
 		super(config);
 		this.config = config;
 	}
-	
+
 	@Override
 	protected void configure () {
 		super.configure();
@@ -38,29 +38,29 @@ public class ClientServiceBinder extends ServiceBinder {
 		bind(DatagramEndpoint.class).annotatedWith(Payload.class).to(UDPDatagramEndpoint.class).in(Singleton.class);
 
 		bind(CounterpartAddress.class).annotatedWith(Payload.class)
-				.toProvider(new CounterpartAddressProvider(config.server().serverHostName(), config.server().serverPayloadPort()));
+				.toProvider(new CounterpartAddressProvider(config.getServer().getServerHostName(), config.getServer().getServerPayloadPort()));
 		bind(CounterpartAddress.class).annotatedWith(KeyExchange.class)
-				.toProvider(new CounterpartAddressProvider(config.server().serverHostName(), config.server().serverKeyExchangePort()));
+				.toProvider(new CounterpartAddressProvider(config.getServer().getServerHostName(), config.getServer().getServerKeyExchangePort()));
 		install(new FactoryModuleBuilder()
 				.implement(ClientMultiplexedDatagramEndpoint.class, ClientMultiplexedDatagramEndpoint.class)
 				.build(ClientMultiplexedDatagramEndpointFactory.class));
 
-		switch (config.sessionConverter().type()) {
-		case DEFAULT:
-			install(new FactoryModuleBuilder()
-					.implement(SessionConverter.class, NoCryptoSessionConverter.class)
-					.build(DefaultClientSessionConverterFactory.class));
-			bind(SessionConverterFactory.class).to(DefaultClientSessionConverterFactory.class);
-			break;
-		case NO_CRYPTO:
-			install(new FactoryModuleBuilder()
-					.implement(SessionConverter.class, NoCryptoSessionConverter.class)
-					.build(NoCryptoSessionConverterFactory.class));
-			bind(SessionConverterFactory.class).to(NoCryptoSessionConverterFactory.class);
-			break;
-		default:
-			// throw some error or something
-			break;
+		switch (config.getSessionConverter().getType()) {
+			case DEFAULT:
+				install(new FactoryModuleBuilder()
+						.implement(SessionConverter.class, NoCryptoSessionConverter.class)
+						.build(DefaultClientSessionConverterFactory.class));
+				bind(SessionConverterFactory.class).to(DefaultClientSessionConverterFactory.class);
+				break;
+			case NO_CRYPTO:
+				install(new FactoryModuleBuilder()
+						.implement(SessionConverter.class, NoCryptoSessionConverter.class)
+						.build(NoCryptoSessionConverterFactory.class));
+				bind(SessionConverterFactory.class).to(NoCryptoSessionConverterFactory.class);
+				break;
+			default:
+				// throw some error or something
+				break;
 		}
 
 	}

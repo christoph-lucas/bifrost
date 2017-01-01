@@ -3,13 +3,15 @@ package ch.bifrost.core.api.config;
 import org.bouncycastle.crypto.agreement.DHStandardGroups;
 import org.bouncycastle.crypto.params.DHParameters;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Data
-@Accessors(chain = true, fluent = true)
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 public class DHKeyExchangeAlgorithmConfiguration extends KeyExchangeAlgorithmConfiguration {
 
@@ -21,8 +23,9 @@ public class DHKeyExchangeAlgorithmConfiguration extends KeyExchangeAlgorithmCon
 		super(TYPE_NAME);
 	}
 
+	@JsonIgnore
 	public DHParameters getParsedDHParams () {
-		return DhParams.valueOf(this.dhParams).params();
+		return DhParams.valueOf(this.dhParams).getParams();
 	}
 
 	public static enum DhParams {

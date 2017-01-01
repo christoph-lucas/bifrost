@@ -23,9 +23,10 @@ public class DefaultSessionTest extends AbstractSessionTest {
 	public static final byte[] PING = MessageCodecUtils.encodeStringAsByteArray("ping");
 	public static final byte[] PONG = MessageCodecUtils.encodeStringAsByteArray("pong");
 
+	@Override
 	protected BifrostConfiguration getConfig () {
 		BifrostConfiguration config = super.getConfig();
-		config.sessionConverter().type(SessionConverterType.DEFAULT);
+		config.getSessionConverter().setType(SessionConverterType.DEFAULT);
 		return config;
 	}
 
@@ -57,14 +58,14 @@ public class DefaultSessionTest extends AbstractSessionTest {
 
 	@Test
 	public void shouldPingAndRekey () throws Exception {
-		DefaultClientSessionConverter clientConverter = (DefaultClientSessionConverter) client().initializeSession(1000, TimeUnit.SECONDS);
+		try (DefaultClientSessionConverter clientConverter = (DefaultClientSessionConverter) client().initializeSession(1000, TimeUnit.SECONDS)) {
+			client().send(new SessionMessage(PING));
+			SessionMessage message = client().receive();
+			LOG.info("---------> Client received a message: '" + MessageCodecUtils.decodeStringFromByteArray(message.getPayload()) + "'");
+			assertThat(message.getPayload(), is(equalTo(PING)));
 
-		client().send(new SessionMessage(PING));
-		SessionMessage message = client().receive();
-		LOG.info("---------> Client received a message: '" + MessageCodecUtils.decodeStringFromByteArray(message.getPayload()) + "'");
-		assertThat(message.getPayload(), is(equalTo(PING)));
-
-		clientConverter.rekey();
+			clientConverter.rekey();
+		}
 	}
 
 }
