@@ -11,6 +11,7 @@ import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithId;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithIdSender;
+import ch.bifrost.core.impl.datagram.InvalidDatagramException;
 import ch.bifrost.core.impl.datagram.MultiplexedDatagramEndpoint;
 
 /**
@@ -28,13 +29,13 @@ public class ClientMultiplexedDatagramEndpoint extends MultiplexedDatagramEndpoi
 	}
 
 	@Override
-	protected DatagramMessageWithId internalReceive () throws IOException, InterruptedException {
+	protected DatagramMessageWithId internalReceive () throws IOException, InterruptedException, InvalidDatagramException {
 		DatagramMessage receivedPacket = datagramEndpoint.receive();
 		return DatagramMessageWithId.from(receivedPacket);
 	}
 
 	@Override
-	protected Optional<DatagramMessageWithId> internalReceive (long timeout, TimeUnit unit) throws IOException, InterruptedException {
+	protected Optional<DatagramMessageWithId> internalReceive (long timeout, TimeUnit unit) throws IOException, InterruptedException, InvalidDatagramException {
 		Optional<DatagramMessage> receivedPacket = datagramEndpoint.receive(timeout, unit);
 		if (receivedPacket.isPresent()) {
 			return Optional.of(DatagramMessageWithId.from(receivedPacket.get()));

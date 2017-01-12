@@ -19,6 +19,7 @@ import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithId;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithIdSender;
+import ch.bifrost.core.impl.datagram.InvalidDatagramException;
 import ch.bifrost.core.impl.datagram.MultiplexedDatagramEndpoint;
 
 /**
@@ -70,29 +71,32 @@ public class DatagramEndpointMultiplexer implements Closeable {
 		@Override
 		public void run () {
 			while (!cancelled) {
-				Optional<DatagramMessage> datagram = Optional.absent();
 				try {
-					datagram = datagramEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
-				} catch (IOException | InterruptedException e) {
-					continue;
-				}
-				if (!datagram.isPresent()) {
-					continue;
-				}
-				LOG.debug("Received a message: " + datagram.get());
-				DatagramMessageWithId datagramMessageWithId = DatagramMessageWithId.from(datagram.get());
-				MultiplexingID id = datagramMessageWithId.getMultiplexingId();
-				if (id == null || !endpoints.containsKey(id)) {
-					LOG.warn("Received unknown multiplexing ID: " + id);
-					continue;
-				}
+					Optional<DatagramMessage> datagram = datagramEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
+					if (!datagram.isPresent()) {
+						continue;
+					}
+					LOG.debug("Received a message: " + datagram.get());
 
-				try {
-					endpoints.get(id).put(datagramMessageWithId);
-				} catch (InterruptedException e) {
-					LOG.debug("Cannot queue DatagramMessageWithId: " + e.getMessage(), e);
-					e.printStackTrace();
+					DatagramMessageWithId datagramMessageWithId = DatagramMessageWithId.from(datagram.get());
+					queueMessage(datagramMessageWithId);
+				} catch (IOException | InterruptedException e) {
+					LOG.warn("An error occurred during receiving datagrams.", e);
+				} catch (InvalidDatagramException e) {
+					LOG.debug("Received an invalid datagram: " + e.getMessage(), e);
 				}
+			}
+		}
+
+		private void queueMessage (DatagramMessageWithId messageWithId) throws InvalidDatagramException {
+			MultiplexingID id = messageWithId.getMultiplexingId();
+			if (id == null || !endpoints.containsKey(id)) {
+				throw new InvalidDatagramException("Unknown multiplexing ID: " + id);
+			}
+			try {
+				endpoints.get(id).put(messageWithId);
+			} catch (InterruptedException e) {
+				LOG.error("Cannot queue DatagramMessageWithId: " + e.getMessage(), e);
 			}
 		}
 
