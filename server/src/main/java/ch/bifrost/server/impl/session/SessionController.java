@@ -1,5 +1,6 @@
 package ch.bifrost.server.impl.session;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -8,10 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.inject.Inject;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
-import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.api.session.SessionConverter;
 import ch.bifrost.core.api.session.SessionConverterFactory;
 import ch.bifrost.server.api.server.ServerProcess;
@@ -31,12 +33,16 @@ public class SessionController extends Thread {
 	private ServerProcessFactory serverFactory;
 	private KeyExchangeServer keyExchange;
 	private DatagramEndpointMultiplexer multiplexer;
-	private final SessionStore sessionStore = new SessionStore();
+	private final ServerProcessStore sessionStore = new ServerProcessStore();
 
 	private boolean cancelled;
 	private ExecutorService threadPool;
 
-	public SessionController (KeyExchangeServer keyExchange, DatagramEndpointMultiplexer multiplexer, SessionConverterFactory sessionConverterFactory, ServerProcessFactory serverFactory) {
+	@Inject
+	public SessionController (KeyExchangeServer keyExchange,
+			DatagramEndpointMultiplexer multiplexer,
+			SessionConverterFactory sessionConverterFactory,
+			ServerProcessFactory serverFactory) {
 		this.keyExchange = keyExchange;
 		this.multiplexer = multiplexer;
 		this.sessionConverterFactory = sessionConverterFactory;
@@ -67,9 +73,9 @@ public class SessionController extends Thread {
 				continue;
 			}
 			LOG.debug("Received new Key with ID: " + idKeyPair.getId());
-			SessionConverter sessionconverter = sessionConverterFactory.newSessionConverter(singleSessionEndpoint, idKeyPair);
+			SessionConverter sessionconverter = sessionConverterFactory.create(singleSessionEndpoint, idKeyPair);
 			ServerProcess newServerProcess = serverFactory.newServerProcess(sessionconverter);
-			sessionStore.put(idKeyPair.getId(), newServerProcess);
+			sessionStore.put(newServerProcess);
 			threadPool.submit(newServerProcess);
 
 			nextId = MultiplexingID.createRandomId();
@@ -78,9 +84,10 @@ public class SessionController extends Thread {
 		}
 	}
 
-	public void cancel () {
+	public void cancel () throws IOException {
 		cancelled = true;
 		sessionStore.killAll();
+		keyExchange.close();
 		multiplexer.close();
 		try {
 			Thread.sleep(TIMEOUT);

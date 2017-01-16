@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -18,7 +18,7 @@ public class DHKeyExchangeResponseMessage {
 
 	public static DHKeyExchangeResponseMessage from (byte[] payload) {
 		byte[] idBytes = Arrays.copyOfRange(payload, 0, MultiplexingID.LENGTH_IN_BYTES);
-		MultiplexingID id = MultiplexingID.fromBytes(idBytes);
+		ch.bifrost.core.api.datagram.MultiplexingID id = MultiplexingID.fromBytes(idBytes);
 
 		byte[] keyBytes = Arrays.copyOfRange(payload, MultiplexingID.LENGTH_IN_BYTES, payload.length);
 		BigInteger publicKey = new BigInteger(keyBytes);

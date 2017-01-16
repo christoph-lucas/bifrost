@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
 import ch.bifrost.core.api.session.SessionConverterFactory;
@@ -19,7 +22,8 @@ import ch.bifrost.core.impl.session.defaultImpl.RekeyHandler;
  */
 public class DefaultServerSessionConverter extends DefaultSessionConverter {
 
-	public DefaultServerSessionConverter (DatagramEndpoint endpoint, IdKeyPair key) {
+	@Inject
+	public DefaultServerSessionConverter (@Assisted DatagramEndpoint endpoint, @Assisted IdKeyPair key) {
 		super(endpoint);
 	}
 
@@ -32,12 +36,8 @@ public class DefaultServerSessionConverter extends DefaultSessionConverter {
 		return handlers;
 	}
 
-	public static class DefaultServerSessionConverterFactory implements SessionConverterFactory {
-
-		@Override
-		public DefaultServerSessionConverter newSessionConverter (DatagramEndpoint endpoint, IdKeyPair key) {
-			return new DefaultServerSessionConverter(endpoint, key);
-		}
+	public static interface DefaultServerSessionConverterFactory extends SessionConverterFactory {
+		DefaultServerSessionConverter create(DatagramEndpoint networkAccessPoint, IdKeyPair key);
 	}
 
 }
