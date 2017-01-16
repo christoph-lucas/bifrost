@@ -9,9 +9,9 @@ import com.google.inject.Inject;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
 import ch.bifrost.core.api.keyexchange.Key;
-import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.impl.dependencyInjection.KeyExchange;
 
 public class KeyExchangeServer implements Closeable {

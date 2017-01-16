@@ -1,4 +1,4 @@
-package ch.bifrost.core.api.session;
+package ch.bifrost.core.api.datagram;
 
 import java.util.concurrent.ThreadLocalRandom;
 
