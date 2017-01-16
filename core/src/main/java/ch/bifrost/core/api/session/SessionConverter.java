@@ -1,5 +1,6 @@
 package ch.bifrost.core.api.session;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -8,7 +9,7 @@ import com.google.common.base.Optional;
 /**
  * An abstraction of the session layer. A {@link SessionConverter} together with a (SingleSession- or Multiplexing) Receiver turns a datagram endpoint into a session endpoint.
  */
-public interface SessionConverter {
+public interface SessionConverter extends Closeable {
 
 	/**
 	 * Send the message to the communication partner in this session.
