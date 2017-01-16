@@ -8,6 +8,9 @@ import java.util.concurrent.BlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
 import ch.bifrost.core.api.session.SessionConverterFactory;
@@ -27,7 +30,9 @@ public class DefaultClientSessionConverter extends DefaultSessionConverter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultClientSessionConverter.class);
 
-	public DefaultClientSessionConverter (DatagramEndpoint networkAccessPoint) {
+	@Inject
+	public DefaultClientSessionConverter (@Assisted DatagramEndpoint networkAccessPoint,
+			@Assisted IdKeyPair key) {
 		super(networkAccessPoint);
 	}
 
@@ -49,12 +54,8 @@ public class DefaultClientSessionConverter extends DefaultSessionConverter {
 		getSender().send(new Message(MessageIdentifier.CONTROL_REKEY, messageBytes));
 	}
 
-	public static class DefaultClientSessionConverterFactory implements SessionConverterFactory {
-
-		@Override
-		public DefaultClientSessionConverter newSessionConverter (DatagramEndpoint networkAccessPoint, IdKeyPair key) {
-			return new DefaultClientSessionConverter(networkAccessPoint);
-		}
+	public static interface DefaultClientSessionConverterFactory extends SessionConverterFactory {
+		DefaultClientSessionConverter create(DatagramEndpoint networkAccessPoint, IdKeyPair key);
 	}
 
 }

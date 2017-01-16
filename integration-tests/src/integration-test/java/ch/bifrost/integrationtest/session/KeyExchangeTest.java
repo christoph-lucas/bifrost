@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.ConsoleAppender;
@@ -15,21 +14,22 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.base.Optional;
+import com.google.inject.Guice;
 
+import ch.bifrost.client.impl.dependencyInjection.ClientServiceBinder;
 import ch.bifrost.client.impl.keyexchange.KeyExchangeClient;
-import ch.bifrost.core.api.datagram.CounterpartAddress;
-import ch.bifrost.core.api.datagram.DatagramEndpoint;
+import ch.bifrost.core.api.config.BifrostConfiguration;
 import ch.bifrost.core.api.keyexchange.IdKeyPair;
 import ch.bifrost.core.api.session.MultiplexingID;
 import ch.bifrost.core.impl.MessageCodecUtils;
-import ch.bifrost.core.impl.datagram.UDPDatagramEndpoint;
+import ch.bifrost.server.impl.dependencyInjection.ServerServiceBinder;
 import ch.bifrost.server.impl.keyexchange.KeyExchangeServer;
 import lombok.Getter;
 
 public class KeyExchangeTest {
 
-	private static InetAddress SERVER_HOST;
-	private static final int SERVER_PORT = 4567;
+	private static final String SERVER_HOST_NAME = "localhost";
+	private static final int SERVER_PORT_KEY_EXCHANGE = 4567;
 	// ID must be 32 bytes
 	private static final MultiplexingID ID = MultiplexingID.fromBytes(
 			MessageCodecUtils.encodeStringAsByteArrayWithFixedLength("01234567890123456789012345678912", MultiplexingID.LENGTH_IN_BYTES));
@@ -42,28 +42,34 @@ public class KeyExchangeTest {
 		console.setThreshold(Level.ALL);
 		console.activateOptions();
 		org.apache.log4j.Logger.getRootLogger().addAppender(console);
-		SERVER_HOST = InetAddress.getByName("localhost");
 	}
 
 	@Test
 	public void shouldExchangeAKey () throws Exception {
-		DatagramEndpoint serverEndpoint = new UDPDatagramEndpoint(SERVER_PORT);
-		KeyExchangeServer server = new KeyExchangeServer(serverEndpoint);
+		try (
+				KeyExchangeServer server = Guice.createInjector(new ServerServiceBinder(getConfig())).getInstance(KeyExchangeServer.class);
+				KeyExchangeClient client = Guice.createInjector(new ClientServiceBinder(getConfig())).getInstance(KeyExchangeClient.class)
+		) {
+			ServerThread serverThread = new ServerThread(server);
 
-		DatagramEndpoint clientEndpoint = new UDPDatagramEndpoint();
-		CounterpartAddress serverAddress = new CounterpartAddress(SERVER_HOST, SERVER_PORT);
-		KeyExchangeClient client = new KeyExchangeClient(clientEndpoint, serverAddress);
-		ServerThread serverThread = new ServerThread(server);
+			serverThread.start();
+			Optional<IdKeyPair> clientKey = client.get(1000, TimeUnit.SECONDS);
+			serverThread.join();
 
-		serverThread.start();
-		Optional<IdKeyPair> clientKey = client.get(1000, TimeUnit.SECONDS);
-		serverThread.join();
+			assertTrue(clientKey.isPresent());
+			assertThat(clientKey.get().getId(), is(equalTo(ID)));
+			assertTrue(serverThread.getServerKey().isPresent());
+			assertThat(serverThread.getServerKey().get().getId(), is(equalTo(ID)));
+			assertThat(serverThread.getServerKey().get().getKey(), is(equalTo(clientKey.get().getKey())));
+		}
+	}
 
-		assertTrue(clientKey.isPresent());
-		assertThat(clientKey.get().getId(), is(equalTo(ID)));
-		assertTrue(serverThread.getServerKey().isPresent());
-		assertThat(serverThread.getServerKey().get().getId(), is(equalTo(ID)));
-		assertThat(serverThread.getServerKey().get().getKey(), is(equalTo(clientKey.get().getKey())));
+	protected BifrostConfiguration getConfig () {
+		BifrostConfiguration config = new BifrostConfiguration();
+		config.getServer()
+				.setServerHostName(SERVER_HOST_NAME)
+				.setServerKeyExchangePort(SERVER_PORT_KEY_EXCHANGE);
+		return config;
 	}
 
 	private static class ServerThread extends Thread {

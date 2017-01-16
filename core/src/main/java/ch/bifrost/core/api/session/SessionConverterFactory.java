@@ -14,6 +14,6 @@ public interface SessionConverterFactory {
 	 * @param networkAccessPoint to be used
 	 * @return a new {@link SessionConverter}
 	 */
-	SessionConverter newSessionConverter (DatagramEndpoint networkAccessPoint, IdKeyPair key);
+	SessionConverter create (DatagramEndpoint networkAccessPoint, IdKeyPair key);
 
 }
