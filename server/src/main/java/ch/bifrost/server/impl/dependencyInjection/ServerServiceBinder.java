@@ -14,6 +14,8 @@ import ch.bifrost.core.impl.dependencyInjection.UdpDatagramEndpointProvider;
 import ch.bifrost.core.impl.session.NoCryptoSessionConverter;
 import ch.bifrost.core.impl.session.NoCryptoSessionConverter.NoCryptoSessionConverterFactory;
 import ch.bifrost.server.api.server.ServerProcessFactory;
+import ch.bifrost.server.impl.keyexchange.DHKeyExchangeServer;
+import ch.bifrost.server.impl.keyexchange.KeyExchangeServer;
 import ch.bifrost.server.impl.server.EchoServer.EchoServerFactory;
 import ch.bifrost.server.impl.session.DefaultServerSessionConverter.DefaultServerSessionConverterFactory;
 
@@ -36,6 +38,8 @@ public class ServerServiceBinder extends ServiceBinder {
 				.toProvider(new UdpDatagramEndpointProvider(config.getServer().getServerKeyExchangePort())).in(Singleton.class);
 		bind(DatagramEndpoint.class).annotatedWith(Payload.class)
 				.toProvider(new UdpDatagramEndpointProvider(config.getServer().getServerPayloadPort())).in(Singleton.class);
+
+		bind(KeyExchangeServer.class).to(DHKeyExchangeServer.class);
 
 		switch (config.getSessionConverter().getType()) {
 			case DEFAULT:

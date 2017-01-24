@@ -23,9 +23,9 @@ public class SessionClient implements Closeable {
 
 	private final KeyExchangeClient keyExchange;
 	private final SessionConverterFactory sessionConverterFactory;
-	
+
 	private final ClientMultiplexedDatagramEndpointFactory clientMultiplexedDatagramEndpointFactory;
-	
+
 	private boolean sessionInitialized = false;
 	private SessionConverter sessionConverter;
 
@@ -35,9 +35,11 @@ public class SessionClient implements Closeable {
 			ClientMultiplexedDatagramEndpointFactory clientMultiplexedDatagramEndpointFactory) throws SocketException {
 		this.keyExchange = keyExchange;
 		this.sessionConverterFactory = sessionConverterFactory;
+
 		this.clientMultiplexedDatagramEndpointFactory = clientMultiplexedDatagramEndpointFactory;
 	}
 
+	@SuppressWarnings("resource")
 	public SessionConverter initializeSession (long timeout, TimeUnit unit) throws Exception {
 		if (sessionInitialized) {
 			throw new RuntimeException("something happened");
@@ -47,7 +49,7 @@ public class SessionClient implements Closeable {
 			throw new RuntimeException("something happened");
 		}
 		IdKeyPair idKeyPair = optional.get();
-		MultiplexedDatagramEndpoint networkAccessPoint = this.clientMultiplexedDatagramEndpointFactory.create(idKeyPair.getId()); 
+		MultiplexedDatagramEndpoint networkAccessPoint = this.clientMultiplexedDatagramEndpointFactory.create(idKeyPair.getId());
 		sessionConverter = sessionConverterFactory.create(networkAccessPoint, idKeyPair);
 		sessionInitialized = true;
 		return sessionConverter;

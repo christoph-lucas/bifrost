@@ -5,6 +5,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 import ch.bifrost.client.impl.datagram.ClientMultiplexedDatagramEndpoint;
 import ch.bifrost.client.impl.datagram.ClientMultiplexedDatagramEndpoint.ClientMultiplexedDatagramEndpointFactory;
+import ch.bifrost.client.impl.keyexchange.DHKeyExchangeClient;
+import ch.bifrost.client.impl.keyexchange.KeyExchangeClient;
 import ch.bifrost.client.impl.session.DefaultClientSessionConverter.DefaultClientSessionConverterFactory;
 import ch.bifrost.core.api.config.BifrostConfiguration;
 import ch.bifrost.core.api.datagram.CounterpartAddress;
@@ -36,6 +38,8 @@ public class ClientServiceBinder extends ServiceBinder {
 
 		bind(DatagramEndpoint.class).annotatedWith(KeyExchange.class).to(UDPDatagramEndpoint.class).in(Singleton.class);
 		bind(DatagramEndpoint.class).annotatedWith(Payload.class).to(UDPDatagramEndpoint.class).in(Singleton.class);
+
+		bind(KeyExchangeClient.class).to(DHKeyExchangeClient.class);
 
 		bind(CounterpartAddress.class).annotatedWith(Payload.class)
 				.toProvider(new CounterpartAddressProvider(config.getServer().getServerHostName(), config.getServer().getServerPayloadPort()));
