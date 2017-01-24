@@ -6,8 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 
-import ch.bifrost.core.api.datagram.MultiplexingID;
-import ch.bifrost.core.impl.datagram.DatagramMessageWithId;
+import ch.bifrost.core.api.datagram.DatagramMessage;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithIdSender;
 import ch.bifrost.core.impl.datagram.MultiplexedDatagramEndpoint;
 
@@ -16,22 +15,21 @@ import ch.bifrost.core.impl.datagram.MultiplexedDatagramEndpoint;
  */
 public class ServerMultiplexedDatagramEndpoint extends MultiplexedDatagramEndpoint {
 
-	private final BlockingQueue<DatagramMessageWithId> receivedMessages;
+	private final BlockingQueue<DatagramMessage> receivedMessages;
 
-	public ServerMultiplexedDatagramEndpoint (DatagramMessageWithIdSender sessionPacketSender, BlockingQueue<DatagramMessageWithId> receivedMessages, MultiplexingID multiplexingId) {
-		super(sessionPacketSender, multiplexingId);
+	public ServerMultiplexedDatagramEndpoint (DatagramMessageWithIdSender sessionPacketSender, BlockingQueue<DatagramMessage> receivedMessages) {
+		super(sessionPacketSender);
 		this.receivedMessages = receivedMessages;
 	}
 
 	@Override
-	protected DatagramMessageWithId internalReceive () throws InterruptedException {
-		DatagramMessageWithId sessionPacket = receivedMessages.take();
-		return sessionPacket;
+	protected DatagramMessage internalReceive () throws InterruptedException {
+		return receivedMessages.take();
 	}
 
 	@Override
-	protected Optional<DatagramMessageWithId> internalReceive (long timeout, TimeUnit unit) throws InterruptedException {
-		DatagramMessageWithId packet = receivedMessages.poll(timeout, unit);
+	protected Optional<DatagramMessage> internalReceive (long timeout, TimeUnit unit) throws InterruptedException {
+		DatagramMessage packet = receivedMessages.poll(timeout, unit);
 		if (packet == null) {
 			return Optional.absent();
 		}

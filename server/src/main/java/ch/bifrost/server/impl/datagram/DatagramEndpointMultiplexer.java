@@ -35,14 +35,12 @@ public class DatagramEndpointMultiplexer implements Closeable {
 	public static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 
 	private final MultiplexingReceiver receiver;
-	private final DatagramMessageWithIdSender sessionPacketSender;
-	private final Map<MultiplexingID, BlockingQueue<DatagramMessageWithId>> endpoints = new HashMap<>();
-	private DatagramEndpoint datagramEndpoint;
+	private final Map<MultiplexingID, BlockingQueue<DatagramMessage>> endpoints = new HashMap<>();
+	private final DatagramEndpoint datagramEndpoint;
 
 	@Inject
 	public DatagramEndpointMultiplexer (@Payload DatagramEndpoint datagramEndpoint) throws SocketException {
 		this.datagramEndpoint = datagramEndpoint;
-		sessionPacketSender = new DatagramMessageWithIdSender(datagramEndpoint);
 		receiver = new MultiplexingReceiver(datagramEndpoint);
 		receiver.start();
 	}
@@ -57,8 +55,9 @@ public class DatagramEndpointMultiplexer implements Closeable {
 		if (endpoints.containsKey(id)) {
 			throw new DuplicateMultiplexingIdException("The ID " + id + " is already registered.");
 		}
-		BlockingQueue<DatagramMessageWithId> queue = new LinkedBlockingQueue<>();
-		MultiplexedDatagramEndpoint singleSessionEndpoint = new ServerMultiplexedDatagramEndpoint(sessionPacketSender, queue, id);
+		BlockingQueue<DatagramMessage> queue = new LinkedBlockingQueue<>();
+		DatagramMessageWithIdSender datagramWithIdSender = new DatagramMessageWithIdSender(datagramEndpoint, id);
+		MultiplexedDatagramEndpoint singleSessionEndpoint = new ServerMultiplexedDatagramEndpoint(datagramWithIdSender, queue);
 		endpoints.put(id, queue);
 		return singleSessionEndpoint;
 	}
@@ -83,7 +82,6 @@ public class DatagramEndpointMultiplexer implements Closeable {
 						continue;
 					}
 					LOG.debug("Received a message: " + datagram.get());
-
 					DatagramMessageWithId datagramMessageWithId = DatagramMessageWithId.from(datagram.get());
 					queueMessage(datagramMessageWithId);
 				} catch (IOException | InterruptedException e) {
@@ -100,7 +98,7 @@ public class DatagramEndpointMultiplexer implements Closeable {
 				throw new InvalidDatagramException("Unknown multiplexing ID: " + id);
 			}
 			try {
-				endpoints.get(id).put(messageWithId);
+				endpoints.get(id).put(messageWithId.getPlainDatagram());
 			} catch (InterruptedException e) {
 				LOG.error("Cannot queue DatagramMessageWithId: " + e.getMessage(), e);
 			}

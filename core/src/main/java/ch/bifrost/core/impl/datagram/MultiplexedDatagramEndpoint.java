@@ -8,63 +8,43 @@ import com.google.common.base.Optional;
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
-import ch.bifrost.core.api.datagram.MultiplexingID;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Accessors(fluent = true)
 public abstract class MultiplexedDatagramEndpoint implements DatagramEndpoint {
 
-	private final DatagramMessageWithIdSender sessionPacketSender;
-	private final MultiplexingID multiplexingId;
+	private final DatagramMessageWithIdSender datagramWithIdSender;
 	@Setter
 	private CounterpartAddress counterpartAddress;
 
-	public MultiplexedDatagramEndpoint (DatagramMessageWithIdSender sessionPacketSender, MultiplexingID multiplexingId) {
-		this.sessionPacketSender = sessionPacketSender;
-		this.multiplexingId = multiplexingId;
+	public MultiplexedDatagramEndpoint (DatagramMessageWithIdSender datagramWithIdSender) {
+		this.datagramWithIdSender = datagramWithIdSender;
 	}
 
-	protected abstract DatagramMessageWithId internalReceive () throws IOException, InterruptedException, InvalidDatagramException;
+	protected abstract DatagramMessage internalReceive () throws IOException, InterruptedException, InvalidDatagramException;
 
-	protected abstract Optional<DatagramMessageWithId> internalReceive (long timeout, TimeUnit unit) throws IOException, InterruptedException, InvalidDatagramException;
+	protected abstract Optional<DatagramMessage> internalReceive (long timeout, TimeUnit unit) throws IOException, InterruptedException, InvalidDatagramException;
 
 	@Override
 	public void send (DatagramMessage message) throws IOException {
-		DatagramMessageWithId datagramWithId;
+		DatagramMessage datagram;
 		if (counterpartAddress != null && counterpartAddress.isValid()) {
-			datagramWithId = new DatagramMessageWithId(counterpartAddress, message.getPayload(), multiplexingId);
+			datagram = new DatagramMessage(counterpartAddress, message.getPayload());
 		} else {
-			datagramWithId = new DatagramMessageWithId(message.getCounterpartAddress(), message.getPayload(), multiplexingId);
+			datagram = new DatagramMessage(message.getCounterpartAddress(), message.getPayload());
 		}
-		sessionPacketSender.send(datagramWithId);
+		datagramWithIdSender.send(datagram);
 	}
 
 	@Override
 	public DatagramMessage receive () throws IOException, InterruptedException, InvalidDatagramException {
-		while (true) { // run until we have a valid message
-			DatagramMessageWithId datagramMessageWithId = internalReceive();
-			if (multiplexingId.equals(datagramMessageWithId.getMultiplexingId())) {
-				return new DatagramMessage(
-						datagramMessageWithId.getCounterpartAddress(),
-						datagramMessageWithId.getPayload());
-			}
-		}
+		return internalReceive();
 	}
 
 	@Override
 	public Optional<DatagramMessage> receive (long timeout, TimeUnit unit) throws IOException, InterruptedException, InvalidDatagramException {
-		Optional<DatagramMessageWithId> datagramMessageWithId = internalReceive(timeout, unit);
-		if (!datagramMessageWithId.isPresent()) {
-			return Optional.absent();
-		}
-		if (multiplexingId.equals(datagramMessageWithId.get().getMultiplexingId())) {
-			return Optional.of(new DatagramMessage(
-					datagramMessageWithId.get().getCounterpartAddress(),
-					datagramMessageWithId.get().getPayload()));
-		}
-		// received a message with wrong counterpart, return even if the timeout is not yet over
-		return Optional.absent();
+		return internalReceive(timeout, unit);
 	}
 
 }
