@@ -4,7 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramMessage;
-import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

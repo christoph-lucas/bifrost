@@ -13,14 +13,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.inject.Inject;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
-import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithId;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithIdSender;
 import ch.bifrost.core.impl.datagram.InvalidDatagramException;
 import ch.bifrost.core.impl.datagram.MultiplexedDatagramEndpoint;
+import ch.bifrost.core.impl.dependencyInjection.Payload;
 
 /**
  * Multiplexes a single {@link DatagramEndpoint} into several {@link MultiplexedDatagramEndpoint}. Makes sure each message is sent to the correct process.
@@ -35,16 +37,20 @@ public class DatagramEndpointMultiplexer implements Closeable {
 	private final MultiplexingReceiver receiver;
 	private final DatagramMessageWithIdSender sessionPacketSender;
 	private final Map<MultiplexingID, BlockingQueue<DatagramMessageWithId>> endpoints = new HashMap<>();
+	private DatagramEndpoint datagramEndpoint;
 
-	public DatagramEndpointMultiplexer (DatagramEndpoint datagramEndpoint) throws SocketException {
+	@Inject
+	public DatagramEndpointMultiplexer (@Payload DatagramEndpoint datagramEndpoint) throws SocketException {
+		this.datagramEndpoint = datagramEndpoint;
 		sessionPacketSender = new DatagramMessageWithIdSender(datagramEndpoint);
 		receiver = new MultiplexingReceiver(datagramEndpoint);
 		receiver.start();
 	}
 
 	@Override
-	public void close () {
+	public void close () throws IOException {
 		receiver.cancel();
+		datagramEndpoint.close();
 	}
 
 	public MultiplexedDatagramEndpoint registerSessionID (MultiplexingID id) {

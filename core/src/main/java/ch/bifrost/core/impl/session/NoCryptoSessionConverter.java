@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
@@ -25,7 +27,9 @@ public class NoCryptoSessionConverter implements SessionConverter {
 
 	private DatagramEndpoint networkAccessPoint;
 
-	public NoCryptoSessionConverter (DatagramEndpoint networkAccessPoint) {
+	@Inject
+	public NoCryptoSessionConverter (@Assisted DatagramEndpoint networkAccessPoint,
+			@Assisted IdKeyPair key) {
 		this.networkAccessPoint = networkAccessPoint;
 	}
 
@@ -54,12 +58,16 @@ public class NoCryptoSessionConverter implements SessionConverter {
 		return Optional.absent();
 	}
 
-	public static class NoCryptoSessionConverterFactory implements SessionConverterFactory {
-
-		@Override
-		public NoCryptoSessionConverter newSessionConverter (DatagramEndpoint networkAccessPoint, IdKeyPair key) {
-			return new NoCryptoSessionConverter(networkAccessPoint);
-		}
+	@Override
+	public void close () throws IOException {
+		this.networkAccessPoint.close();
 	}
+
+	public static interface NoCryptoSessionConverterFactory extends SessionConverterFactory {
+		@Override
+		NoCryptoSessionConverter create(DatagramEndpoint networkAccessPoint, IdKeyPair key);
+	}
+	
+
 
 }
