@@ -1,4 +1,4 @@
-package ch.bifrost.core.api.session;
+package ch.bifrost.core.api.datagram;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,6 +24,9 @@ public class MultiplexingID {
 	}
 
 	public static MultiplexingID fromBytes (byte[] idAsByte) {
+		if (idAsByte.length != LENGTH_IN_BYTES) {
+			throw new IllegalArgumentException("Input array has wrong length. Expected " + LENGTH_IN_BYTES + ", got " + idAsByte.length + ".");
+		}
 		return new MultiplexingID(Arrays.clone(idAsByte));
 	}
 

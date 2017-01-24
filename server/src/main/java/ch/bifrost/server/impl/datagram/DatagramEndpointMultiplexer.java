@@ -13,13 +13,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.inject.Inject;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
-import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithId;
 import ch.bifrost.core.impl.datagram.DatagramMessageWithIdSender;
+import ch.bifrost.core.impl.datagram.InvalidDatagramException;
 import ch.bifrost.core.impl.datagram.MultiplexedDatagramEndpoint;
+import ch.bifrost.core.impl.dependencyInjection.Payload;
 
 /**
  * Multiplexes a single {@link DatagramEndpoint} into several {@link MultiplexedDatagramEndpoint}. Makes sure each message is sent to the correct process.
@@ -35,15 +38,17 @@ public class DatagramEndpointMultiplexer implements Closeable {
 	private final Map<MultiplexingID, BlockingQueue<DatagramMessage>> endpoints = new HashMap<>();
 	private final DatagramEndpoint datagramEndpoint;
 
-	public DatagramEndpointMultiplexer (DatagramEndpoint datagramEndpoint) throws SocketException {
+	@Inject
+	public DatagramEndpointMultiplexer (@Payload DatagramEndpoint datagramEndpoint) throws SocketException {
 		this.datagramEndpoint = datagramEndpoint;
 		receiver = new MultiplexingReceiver(datagramEndpoint);
 		receiver.start();
 	}
 
 	@Override
-	public void close () {
+	public void close () throws IOException {
 		receiver.cancel();
+		datagramEndpoint.close();
 	}
 
 	public MultiplexedDatagramEndpoint registerSessionID (MultiplexingID id) {
@@ -71,29 +76,31 @@ public class DatagramEndpointMultiplexer implements Closeable {
 		@Override
 		public void run () {
 			while (!cancelled) {
-				Optional<DatagramMessage> datagram = Optional.absent();
 				try {
-					datagram = datagramEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
+					Optional<DatagramMessage> datagram = datagramEndpoint.receive(TIMEOUT, TIMEOUT_UNIT);
+					if (!datagram.isPresent()) {
+						continue;
+					}
+					LOG.debug("Received a message: " + datagram.get());
+					DatagramMessageWithId datagramMessageWithId = DatagramMessageWithId.from(datagram.get());
+					queueMessage(datagramMessageWithId);
 				} catch (IOException | InterruptedException e) {
-					continue;
+					LOG.warn("An error occurred during receiving datagrams.", e);
+				} catch (InvalidDatagramException e) {
+					LOG.debug("Received an invalid datagram: " + e.getMessage(), e);
 				}
-				if (!datagram.isPresent()) {
-					continue;
-				}
-				LOG.debug("Received a message: " + datagram.get());
-				DatagramMessageWithId datagramMessageWithId = DatagramMessageWithId.from(datagram.get());
-				MultiplexingID id = datagramMessageWithId.getMultiplexingId();
-				if (id == null || !endpoints.containsKey(id)) {
-					LOG.warn("Received unknown multiplexing ID: " + id);
-					continue;
-				}
+			}
+		}
 
-				try {
-					endpoints.get(id).put(datagramMessageWithId.getPlainDatagram());
-				} catch (InterruptedException e) {
-					LOG.debug("Cannot queue DatagramMessageWithId: " + e.getMessage(), e);
-					e.printStackTrace();
-				}
+		private void queueMessage (DatagramMessageWithId messageWithId) throws InvalidDatagramException {
+			MultiplexingID id = messageWithId.getMultiplexingId();
+			if (id == null || !endpoints.containsKey(id)) {
+				throw new InvalidDatagramException("Unknown multiplexing ID: " + id);
+			}
+			try {
+				endpoints.get(id).put(messageWithId.getPlainDatagram());
+			} catch (InterruptedException e) {
+				LOG.error("Cannot queue DatagramMessageWithId: " + e.getMessage(), e);
 			}
 		}
 

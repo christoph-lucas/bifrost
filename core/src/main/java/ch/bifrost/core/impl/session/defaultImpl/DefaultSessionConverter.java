@@ -30,7 +30,10 @@ public abstract class DefaultSessionConverter implements SessionConverter, Close
 	private final Receiver receiver;
 	private DefaultSessionLayerMessageSender sender;
 
+	private DatagramEndpoint networkAccessPoint;
+
 	public DefaultSessionConverter (DatagramEndpoint networkAccessPoint) {
+		this.networkAccessPoint = networkAccessPoint;
 		sender = new DefaultSessionLayerMessageSender(networkAccessPoint);
 		receiver = new Receiver(networkAccessPoint, getMessageHandlers(sender, queueTowardsUpperLayer));
 		receiver.start();
@@ -70,6 +73,7 @@ public abstract class DefaultSessionConverter implements SessionConverter, Close
 
 	@Override
 	public void close () throws IOException {
+		networkAccessPoint.close();
 		receiver.cancel();
 	}
 

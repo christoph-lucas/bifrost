@@ -2,7 +2,7 @@ package ch.bifrost.core.api.keyexchange;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

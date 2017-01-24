@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Optional;
 
+import ch.bifrost.core.impl.datagram.InvalidDatagramException;
+
 /**
  * An endpoint on the datagram layer.
  */
@@ -24,16 +26,18 @@ public interface DatagramEndpoint extends Closeable {
 	 * 
 	 * @return the next message
 	 * @throws IOException thrown when an error occurred during the reception of a packet
+	 * @throws InvalidDatagramException 
 	 */
-	DatagramMessage receive () throws IOException, InterruptedException;
+	DatagramMessage receive () throws IOException, InterruptedException, InvalidDatagramException;
 
 	/**
 	 * Blocking call to receive the next message, waiting at most for the timeout.
 	 * 
 	 * @return the next message or null if timeout exceeded
 	 * @throws IOException thrown when an error occurred during the reception of a packet
+	 * @throws InvalidDatagramException 
 	 */
-	Optional<DatagramMessage> receive (long timeout, TimeUnit unit) throws IOException, InterruptedException;
+	Optional<DatagramMessage> receive (long timeout, TimeUnit unit) throws IOException, InterruptedException, InvalidDatagramException;
 
 	/**
 	 * A datagram endpoint can operate in two different modes: either the counterpart address is fixed, or it is

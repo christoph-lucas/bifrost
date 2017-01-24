@@ -4,7 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import ch.bifrost.core.api.datagram.CounterpartAddress;
 import ch.bifrost.core.api.datagram.DatagramMessage;
-import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -27,8 +27,12 @@ public class DatagramMessageWithId {
 		this.multiplexingId = multiplexingId;
 	}
 
-	public static DatagramMessageWithId from (DatagramMessage packet) {
+	public static DatagramMessageWithId from (DatagramMessage packet) throws InvalidDatagramException {
 		byte[] byteRepresentation = packet.getPayload();
+		
+		if (byteRepresentation.length < MultiplexingID.LENGTH_IN_BYTES) {
+			throw new InvalidDatagramException("Datagram payload shorter than id. Received only " + byteRepresentation.length + " bytes, expected at least " + MultiplexingID.LENGTH_IN_BYTES + " bytes.");
+		}
 
 		byte[] multiplexingIdBytes = ArrayUtils.subarray(byteRepresentation, 0, MultiplexingID.LENGTH_IN_BYTES);
 		MultiplexingID multiplexingId = MultiplexingID.fromBytes(multiplexingIdBytes);

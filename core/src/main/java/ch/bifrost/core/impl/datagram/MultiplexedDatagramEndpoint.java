@@ -22,9 +22,9 @@ public abstract class MultiplexedDatagramEndpoint implements DatagramEndpoint {
 		this.datagramWithIdSender = datagramWithIdSender;
 	}
 
-	protected abstract DatagramMessage internalReceive () throws IOException, InterruptedException;
+	protected abstract DatagramMessage internalReceive () throws IOException, InterruptedException, InvalidDatagramException;
 
-	protected abstract Optional<DatagramMessage> internalReceive (long timeout, TimeUnit unit) throws IOException, InterruptedException;
+	protected abstract Optional<DatagramMessage> internalReceive (long timeout, TimeUnit unit) throws IOException, InterruptedException, InvalidDatagramException;
 
 	@Override
 	public void send (DatagramMessage message) throws IOException {
@@ -38,12 +38,12 @@ public abstract class MultiplexedDatagramEndpoint implements DatagramEndpoint {
 	}
 
 	@Override
-	public DatagramMessage receive () throws IOException, InterruptedException {
+	public DatagramMessage receive () throws IOException, InterruptedException, InvalidDatagramException {
 		return internalReceive();
 	}
 
 	@Override
-	public Optional<DatagramMessage> receive (long timeout, TimeUnit unit) throws IOException, InterruptedException {
+	public Optional<DatagramMessage> receive (long timeout, TimeUnit unit) throws IOException, InterruptedException, InvalidDatagramException {
 		return internalReceive(timeout, unit);
 	}
 

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import ch.bifrost.core.api.datagram.DatagramEndpoint;
 import ch.bifrost.core.api.datagram.DatagramMessage;
-import ch.bifrost.core.api.session.MultiplexingID;
+import ch.bifrost.core.api.datagram.MultiplexingID;
 
 /**
  * Actually just an abstraction of a {@link DatagramEndpoint} for {@link DatagramMessageWithId}s.
