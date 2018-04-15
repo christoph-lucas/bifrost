@@ -24,7 +24,7 @@ public class UDPDatagramEndpoint implements DatagramEndpoint {
 
 	@Getter
 	@Setter
-	private int receiverBufferSizeInBytes = 1024;
+	private int receiverBufferSizeInBytes = 65536;
 
 	private DatagramSocket socket;
 

@@ -1,5 +1,10 @@
 */.gradle
 */build
 */.settings/gradle
+*/.settings/gradle.prefs
+*/bin
+*/gradle-app.setting
 .project
 .classpath
+bin
+.gradle

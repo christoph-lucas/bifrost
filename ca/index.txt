@@ -1,0 +1,1 @@
+V	270526173153Z		1000	unknown	/C=CH/ST=Switzerland/O=Bifrost/OU=Bifrost Intermediate Test CA/CN=Bifrost Intermediate Test CA
